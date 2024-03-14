@@ -7,7 +7,6 @@ const Data = {
 export default async function fetchDirectoryContents(owner, repo, path = '') {
     try {
             const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-            const token = process.env.GITHUB_API_KEY;
             const headers = {
                 'Authorization': `Bearer ${token}`,
                 'X-GitHub-Api-Version': '2022-11-28'
