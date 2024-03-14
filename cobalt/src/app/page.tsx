@@ -23,9 +23,10 @@ export default function Home() {
 
   return (
     <>
-     <div className=" w-full border " >
-      <button onClick={e=>{onLogout()}} type="submit" className="border" >logout</button>
+    <div>
+      <h1>Home</h1>
     </div>
+     
     </>
   );
 }
