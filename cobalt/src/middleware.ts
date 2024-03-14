@@ -20,6 +20,9 @@ export function middleware(request: NextRequest) {
     if(path ==='/prompt'){
       return
     }
+    if(path ==='/guide'){
+      return
+    }
 
     if(isPublicPath && token){
     return NextResponse.redirect(new URL('/', request.nextUrl))
@@ -43,6 +46,10 @@ export const config = {
     '/test',
     '/otherlogins',
     '/prompt',
+<<<<<<< HEAD
     '/snippet'
+=======
+    '/guide'
+>>>>>>> 22f6157555772c3dfcba72e9a465c0837076827a
   ]
 }
