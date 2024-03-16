@@ -7,7 +7,7 @@ const Data = {
 export default async function fetchDirectoryContents(owner, repo, path = '') {
     try {
             const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-            const token = process.env.GITHUB_API_KEY;
+            const token = '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';
             const headers = {
                 'Authorization': `Bearer ${token}`,
                 'X-GitHub-Api-Version': '2022-11-28'
@@ -20,7 +20,6 @@ export default async function fetchDirectoryContents(owner, repo, path = '') {
                 Data[item.path] = "DIR"
                 await fetchDirectoryContents(owner, repo, item.path); 
             } else if (item.type === 'file') {
-                console.log(`File: ${item.path}`);
                 const fileContent = await fetchFileContents(owner, repo, item.path);
                 Data[item.path] = fileContent
             }

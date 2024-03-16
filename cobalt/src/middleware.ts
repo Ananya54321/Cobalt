@@ -46,10 +46,7 @@ export const config = {
     '/test',
     '/otherlogins',
     '/prompt',
-<<<<<<< HEAD
-    '/snippet'
-=======
-    '/guide'
->>>>>>> 22f6157555772c3dfcba72e9a465c0837076827a
+    '/snippet',
+    '/guide',
   ]
 }
