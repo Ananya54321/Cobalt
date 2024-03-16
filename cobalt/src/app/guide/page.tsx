@@ -2,20 +2,20 @@
 import React, { useEffect, useState } from "react";
 import fetchDirectoryContents from "@/helpers/github/gitApi";
 import CircularProgress from "@mui/material/CircularProgress";
-import { generateResponse } from "@/helpers/generateResponse";
 import axios from "axios";
 
 function page() {
-  const [repo, setRepo] = useState(String);
   const [data, setData] = useState<object>();
   const [userName, setUserName] = useState(String);
   const [repoName, setRepoName] = useState(String);
-  const [loading, setLoading] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(String);
-  const[explaination,setExplanation] = useState(String);
+  const [dataLoading, setDataLoading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const[explaination,setExplanation] = useState<object>();
+  const [expLoading, setExpLoading] = useState(false);
+  
 
   const getRepo = async () => {
-    setLoading(true);
+    setDataLoading(true);
     if (repoName == null || userName == null) {
       return null;
     }
@@ -39,19 +39,60 @@ function page() {
     } else {
       setData(JSON.parse(c));
     }
-    setLoading(false);
+    setDataLoading(false);
+    localStorage.clear();
   };
+
+  function ReadMePrompt(readme){
+    const a = "explain the project and what it does and technology from the given read me section \n give the response as a HTML markup with proper html tags \n" + readme
+    return a
+  }
+
+  function FilePrompt(file){
+    const a = "explain the project and what it does and technology from the given read me section \n" + file
+    return a
+  }
+
+
+ async function ExpLoad(d,type){
+  setExpLoading(true)
+    if(type=="README"){
+      await axios.post('api/users/askgeminitext', {prompt: ReadMePrompt(d) }).then((response)=>{
+        setExplanation({...explaination,"README.md":response.data.message})
+        })
+    }
+    else if(type=="FILE"){
+      await axios.post('api/users/askgeminitext', {prompt: FilePrompt(d) }).then((response)=>{
+        setExplanation({...explaination,d:response.data.message})
+        })
+    }
+    setExpLoading(false)
+  }
+
+  const FileChange = async()=>{
+    if(selectedFile !=null){
+      await ExpLoad(selectedFile,"FILE")
+    }else if(selectedFile !=null && hasREADME(selectedFile)){
+      await ExpLoad(selectedFile,"README");
+    }
+  }
 
 
   useEffect(()=>{
-    localStorage.clear();
+    FileChange()
+  },[selectedFile])
+
+
+
+
+
+  useEffect(()=>{
     if(data){
-        Object.keys(data).map((key)=>{
+        Object.keys(data).map(async (key)=>{
             if(hasREADME(key)){
                 setSelectedFile(key);
                 if(data[key]){
-                    console.log(data[key]);
-                    // axios.post('api/users/askgeminitext', {prompt: data[key] })
+                  await ExpLoad(data[key],"README");
                 }
             }
             return null
@@ -80,7 +121,7 @@ function page() {
       <button onClick={getRepo}> get </button>
 
       <div className=" flex flex-row">
-        {loading ? (
+        {dataLoading ? (
           <>
             <CircularProgress color="secondary" />
           </>
@@ -90,22 +131,28 @@ function page() {
               {data &&
                 Object.keys(data).map((key) => {
                   return <div  key={key} className="flex flex-col">
-                <button onClick={()=>{setSelectedFile(key);console.log(key)} }> <p >{key}</p> </button>
+                <button onClick={(e)=>{e.preventDefault();setSelectedFile(key)} }> <p >{key}</p> </button>
                   </div> 
                 })}
             </div>
             <div>{data && Object.keys(data).map((key:any)=>{
                 if(selectedFile == key)
                 {
-                    console.log(data)
                 return  <pre key={key} >{data[selectedFile]} </pre>
             }
                 
             }) }</div>
-            <div> {explaination && <>
-            
-            
-            </>} </div>
+            <div> 
+              {expLoading ? <>
+              dataLoading.....
+              </> : <> 
+                { explaination && 
+                  Object.keys(explaination).map((key) => {
+                    return <div dangerouslySetInnerHTML={{__html:explaination[key]}} key={key}></div>
+                  })
+                }
+              </>}
+            </div>
           </>
         )}
       </div>
@@ -120,3 +167,5 @@ function hasREADME(string: string) {
     const regex = /README\.md/i; // i flag for case-insensitive search
     return regex.test(string);
 }
+
+

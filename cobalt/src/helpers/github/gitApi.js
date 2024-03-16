@@ -4,16 +4,18 @@ const Data = {
 
 }
 
+
+const token = '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';
+const headers = {
+    'Authorization': `token ${token}`,
+    'X-GitHub-Api-Version': '2022-11-28'
+};
+
 export default async function fetchDirectoryContents(owner, repo, path = '') {
     try {
             const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-            const token = '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';
-            const headers = {
-                'Authorization': `Bearer ${token}`,
-                'X-GitHub-Api-Version': '2022-11-28'
-            };
-
         const response = await axios.get(url, { headers });
+        
 
         for (const item of response.data) {
             if (item.type === 'dir' ) {
@@ -24,8 +26,6 @@ export default async function fetchDirectoryContents(owner, repo, path = '') {
                 Data[item.path] = fileContent
             }
         }
-
-
         return Data
 
     } catch (error) {
@@ -36,7 +36,9 @@ export default async function fetchDirectoryContents(owner, repo, path = '') {
 
 async function fetchFileContents(owner, repo, filePath) {
     try {
-        const response = await axios.get(`https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`);
+        const response = await axios.get(`https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`,
+        { headers }
+        );
 
         return Buffer.from(response.data.content, 'base64').toString();
     } catch (error) {
