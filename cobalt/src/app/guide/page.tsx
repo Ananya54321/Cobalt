@@ -5,6 +5,10 @@ import fetchDirectoryContents from '@/helpers/github/gitApi'
 import Link from 'next/link';
 import SnippetComponent from './SnippetComponent';
 import toast from 'react-hot-toast';
+import NavBar from '@/components/NavBar';
+import Image from 'next/image';
+import search from '@/Images/whitesearch.svg';
+
 
 function Page() {
   const [repoLink,setRepoLink] = useState<string>("");
@@ -19,6 +23,7 @@ function Page() {
   const [repLoading,setRepoLoading] = useState(false)
   const [expLoading,setExpLoading] = useState(false);
   const [recentRepos,setRecentRepos] = useState<Array<String>>();
+
 
   const handleSelection = () => {
     const selection = window.getSelection();
@@ -144,48 +149,82 @@ function Page() {
   },[])
 
   return (
-    <>
-    <input type="text" value={repoLink} onChange={(e)=>{setRepoLink(e.target.value)}} name="" id="" />
-    {/* <input  value={userName} onChange={(e)=>{setUserName(e.target.value)}} type="text" name="" id="" /> */}
-    {/* <input value={repoName} onChange={(e)=>{setRepoName(e.target.value)}} type="text" name="" id="" /> */}
+    <div className='spacebg'>
+    <NavBar />
+
+    <div className='flex justify-center gap-5'>
+    <input type="text" value={repoLink} onChange={(e)=>{setRepoLink(e.target.value)}} name="" id="" className=' px-4 py-2 mt-20 h-10 w-[200px] bg-[#1e293b] rounded-md text-[#8f9eb3] focus:outline-none focus:ring focus:ring-opacity-40' />
     {repLoading ? <>
   <button disabled onClick={(e)=>{e.preventDefault();setData(null);GetRepo()}}>getrepo</button>
     </> :<>
-  <button onClick={(e)=>{e.preventDefault();setData(null);GetRepo()}}>getrepo</button>
+  <button className='h-10 mt-20 bg-[#00adf1] rounded-xl min-w-[100px] outline-none cursor-pointer text-lg hover:bg-[#37bcf8] font-semibold text-white' onClick={(e)=>{e.preventDefault();setData(null);GetRepo()}}>getrepo</button>
     </>}
-
-{repLoading ? <>
-
-repo loading......
-
-</> : <>
-
-<div className='flex flex-row'>
-    <div>
-    {data && Object.keys(data).map((key)=>{
-      if(expLoading){
-        return <button disabled onClick={(e)=>{e.preventDefault();setSelectedFile(key)}} key={key} > <p>{key}</p> </button>
-      }else{
-        return <button onClick={(e)=>{e.preventDefault();setSelectedFile(key)}} key={key} > <p>{key}</p> </button>
-      }
-    })}
     </div>
 
-
-    <div>
+    
+    {
+      data != null ?  <div className="h-screen">
+        
+      <div className="grid grid-cols-8 h-5/6">
+        <div className="bg-[#264F9460] col-span-2 m-6 mr-0 rounded-2xl">
+          <div className=" grid grid-cols-6 h-[100%] justify-items-center">
+            <div className="col-span-5 bg-blue-50 w-full m-2 mr-2 rounded-2xl flex flex-col pl-5">
+              <p>{repoName}</p>
+              <hr />
+              <div className="flex flex-col text-left">
+                {data &&
+                  Object.keys(data).map((key) => {
+                    return (
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setSelectedFile(key);
+                        }}
+                        key={key}
+                      >
+                        {" "}
+                        <p>{key}</p>{" "}
+                      </button>
+                    );
+                  })}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="bg-[#264F9460] col-span-3 m-6 mr-0 rounded-2xl text-white">
+          
+            {data &&
+              Object.keys(data).map((key) => {
+                if (key == selectedFile)
+                  return (
+                    <pre className='whitespace-pre-wrap'
+                      onMouseUp={handleSelection}
+                      onMouseDown={() => {
+                        setSelectedText(null);
+                      }}
+                      key={key}
+                    >
+                      {" "}
+                      {data[key]}{" "}
+                    </pre>
+                  );
+              })}
+            <div>
       {data && Object.keys(data).map((key)=>{
           if(key == selectedFile)
           return <pre onMouseUp={handleSelection} onMouseDown={()=>{setSelectedText(null)}} key={key}> {data[key]} </pre>
       })}
       {selectedText && (
         <div className='bg-slate-700' style={{ position: 'absolute', top: buttonPosition.y, left: buttonPosition.x }}>
-          <button onClick={()=>{setSnippetBox(true)}}>Action</button>
+          <button onClick={()=>{setSnippetBox(true)}}>Action</button> 
+          {/* opens snippet box */}
         </div>
       )}
     </div>
-
-    <div>
-      {snippetBox ? <>
+          
+        </div>
+        <div className="bg-[#264F9460] col-span-3 m-6 rounded-2xl text-white">
+          {snippetBox ? <>
       <button onClick={()=>{setSnippetBox(false)}}> close </button>
       <SnippetComponent code={selectedText}  /> 
       </> : 
@@ -197,19 +236,24 @@ repo loading......
         </> : <>
         
         {explanations && Object.keys(explanations).map((key)=>{
-        return <pre  key={key}>{explanations[key]} </pre>
+        return <pre className='whitespace-pre-wrap' key={key}>{explanations[key]} </pre>
       })}
       </>}
         </>
       }
+          
+        </div>
+      </div>
+      
+    </div> : <div className='flex justify-center items-center mt-16'>
+    <Image src={search} alt={'search'} className="h-[600px] w-[600px]"></Image>
+
+    </div>
+    } 
+     
+
       
     </div>
-</div>
-
-</>}
-
-
-    </>
   )
 }
 
