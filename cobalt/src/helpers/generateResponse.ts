@@ -7,14 +7,8 @@ const model = configuration.getGenerativeModel({ model: modelId });
 
 export const generateResponse = async (prompt:any,currentMessages:any) => {
   try {
-    const chat = model.startChat({
-      history: currentMessages,
-      generationConfig: {
-        maxOutputTokens: 100,
-      },
-    });
-
-    const result = await chat.sendMessage(prompt);
+  
+    const result = await model.generateContent(prompt)
     const response = result.response;
     const responseText = response.text();
     return responseText

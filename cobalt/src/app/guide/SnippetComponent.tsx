@@ -1,12 +1,25 @@
+'use client'
 import React, { useState ,useEffect} from "react";
 import axios from 'axios';
-export default function SnippetComponent(){
-   
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+export default function SnippetComponent({code}){
+  
+
+    const router = useRouter()
+
+  useEffect(()=>{
+    if(code){
+      setSnippetData({...snippetData,code:code})
+    }
+  },[])
+
+
     let [snippetData,setSnippetData]=useState({
         title:"",
         description:"",
         code:"",
-        tags: [] // Change tags to an array
+        tags: [] 
     })
     const [tagInput, setTagInput] = useState('');
   
@@ -18,7 +31,7 @@ export default function SnippetComponent(){
         e.preventDefault();
         
         if (tagInput.trim() !== '') {
-            setSnippetData(prevData => ({
+            setSnippetData((prevData:any) => ({
                 ...prevData,
                 tags: [...prevData.tags, tagInput.trim()] 
             }));
@@ -43,7 +56,13 @@ export default function SnippetComponent(){
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-          await axios.post('/api/snippets', snippetData);
+          await axios.post('api/users/addsnippet', snippetData).then((res)=>{
+            if(res.data.success == false){
+                toast.error("Please Login")
+                router.push('/login')
+                return
+              }
+          })
             console.log('Sending data to MongoDB:', snippetData);
             
         } catch (error) {
@@ -69,6 +88,6 @@ export default function SnippetComponent(){
                 <button onClick={addTag}>Add Tag</button>
                 <button type="submit">Add Snippet</button>
             </form>
-        </div>
-    );
+       </div>
+       );
 }

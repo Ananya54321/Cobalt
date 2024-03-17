@@ -18,9 +18,9 @@ const snippetSchema = new mongoose.Schema({
         type:String,
         default:"Local"
     },
-    tags:{
-        type:String,
-        required:true,
+    tags: {
+        type: [String], 
+        default:[]
     },
     description:{
         type:String,

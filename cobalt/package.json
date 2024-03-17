@@ -8,7 +8,11 @@
     "start": "next start"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.0",
     "@google/generative-ai": "^0.2.1",
+    "@mui/material": "^5.15.13",
+    "@octokit/rest": "^20.0.2",
     "@radix-ui/react-icons": "^1.3.0",
     "@radix-ui/react-slot": "^1.0.2",
     "@types/body-parser": "^1.19.5",
@@ -32,6 +36,7 @@
     "mongoose": "^7.4.0",
     "next": "13.4.10",
     "nodemailer": "^6.9.4",
+    "octokit": "^3.1.2",
     "openai": "^4.27.0",
     "postcss": "8.4.26",
     "react": "18.2.0",
