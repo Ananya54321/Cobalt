@@ -48,9 +48,6 @@ function Page() {
 
   const GetRepo =async()=>{
     
-    // if(userName==null || repoName==null ){
-    //   return
-    // }
     if(repoLink==null || repoLink == ""){
       return
     }
@@ -148,6 +145,10 @@ function Page() {
     // localStorage.clear();
   },[])
 
+
+
+
+
   return (
     <div className='spacebg'>
     <NavBar />
@@ -159,6 +160,26 @@ function Page() {
     </> :<>
   <button className='h-10 mt-20 bg-[#00adf1] rounded-xl min-w-[100px] outline-none cursor-pointer text-lg hover:bg-[#37bcf8] font-semibold text-white' onClick={(e)=>{e.preventDefault();setData(null);GetRepo()}}>getrepo</button>
     </>}
+
+
+{repLoading ? <>
+
+repo loading......
+
+</> : <>
+
+<div className='flex flex-row'>
+    <div className='flex flex-col'>
+
+
+
+    {data && Object.keys(data).map((key)=>{
+      if(expLoading){
+        return <button disabled onClick={(e)=>{e.preventDefault();setSelectedFile(key)}} key={key} > <p>{key}</p> </button>
+      }else{
+        return <button onClick={(e)=>{e.preventDefault();setSelectedFile(key)}} key={key} > <p>{key}</p> </button>
+      }
+    })}
     </div>
 
     
