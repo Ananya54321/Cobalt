@@ -2,7 +2,7 @@ const axios = require('axios');
 
 
 
-const token = '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';
+// const token = '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';
 const headers = {
     'Authorization': `token ${token}`,
     'X-GitHub-Api-Version': '2022-11-28'
