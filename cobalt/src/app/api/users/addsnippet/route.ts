@@ -1,0 +1,28 @@
+import {connect} from '@/dbConfig/dbConfig';
+import User from '@/models/userModel';
+import Snippet from '@/models/snippetModel';
+import { NextRequest,NextResponse } from 'next/server';
+import bcryptjs from 'bcryptjs';
+import { sendEmail } from '@/helpers/mailer';
+import { getDataFromToken } from '@/helpers/getDataFromToken';
+
+connect()
+
+export async function POST(request:NextRequest){
+    try {
+        const reqBody = await request.json()
+        const {code,description,title,tags} = reqBody
+        const userId = getDataFromToken(request)
+
+        await Snippet.create({
+            userId:userId,code:code,description:description,title:title,tags:tags
+        })
+
+        return NextResponse.json({message:'snippet created',success:true})
+
+        } catch (error:any) {
+
+        return NextResponse.json({error: error.message},{status:500})
+
+    }
+}

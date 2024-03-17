@@ -1,7 +1,8 @@
 "use client"
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import fetchDirectoryContents from '@/helpers/github/gitApi'
+import Link from 'next/link';
 
 function Page() {
   const [data,setData]= useState<object>();
@@ -9,6 +10,23 @@ function Page() {
   const [repoName,setRepoName]= useState<string>("")
   const [userName,setUserName]= useState<string>("")
   const [selectedFile,setSelectedFile]= useState<string>()
+  const codeRef = useRef(null)
+
+  const [selectedText, setSelectedText] = useState('');
+  const [buttonPosition, setButtonPosition] = useState({ x: 0, y: 0 });
+
+  const handleSelection = () => {
+    const selection = window.getSelection();
+    if (selection) {
+      const selectedText = selection.toString();
+      setSelectedText(selectedText);
+      const range = selection.getRangeAt(0).getBoundingClientRect();
+      const { top, left } = range;
+      setButtonPosition({ x: left, y: top });
+    }
+  };
+
+  useEffect
 
   const GetRepo =async()=>{
     if(userName==null || repoName==null ){
@@ -95,11 +113,13 @@ function Page() {
     return regex.test(string);
   }
 
-// useEffect(()=>{
-// localStorage.clear()
-// },[])
-
-
+  const saveSnippet = async()=>{
+    try {
+      await axios.post('api/users/askgeminitext',{})
+    } catch (error) {
+      
+    }
+  }
 
   return (
     <>
@@ -119,8 +139,13 @@ function Page() {
     <div>
       {data && Object.keys(data).map((key)=>{
           if(key == selectedFile)
-          return <pre key={key}> {data[key]} </pre>
+          return <pre onMouseUp={handleSelection} onMouseDown={()=>{setSelectedText(null)}} key={key}> {data[key]} </pre>
       })}
+      {selectedText && (
+        <div className='bg-slate-700' style={{ position: 'absolute', top: buttonPosition.y, left: buttonPosition.x }}>
+          <Link href={`snippet?code=${encodeURIComponent(selectedText)}`} >Action</Link>
+        </div>
+      )}
     </div>
 
     <div>

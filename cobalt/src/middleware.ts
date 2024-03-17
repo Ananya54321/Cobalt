@@ -23,7 +23,6 @@ export function middleware(request: NextRequest) {
     if(path ==='/guide'){
       return
     }
-
     if(isPublicPath && token){
     return NextResponse.redirect(new URL('/', request.nextUrl))
     }
