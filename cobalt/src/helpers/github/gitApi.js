@@ -1,17 +1,17 @@
 const axios = require('axios');
 
-const Data = {
-
-}
 
 
-const token = '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';
+const token = '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';
 const headers = {
     'Authorization': `token ${token}`,
     'X-GitHub-Api-Version': '2022-11-28'
 };
 
 export default async function fetchDirectoryContents(owner, repo, path = '') {
+    const Data = {
+
+    }
     try {
             const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
         const response = await axios.get(url, { headers });

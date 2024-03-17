@@ -1,171 +1,140 @@
-"use client";
-import React, { useEffect, useState } from "react";
-import fetchDirectoryContents from "@/helpers/github/gitApi";
-import CircularProgress from "@mui/material/CircularProgress";
-import axios from "axios";
+"use client"
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
+import fetchDirectoryContents from '@/helpers/github/gitApi'
 
-function page() {
-  const [data, setData] = useState<object>();
-  const [userName, setUserName] = useState(String);
-  const [repoName, setRepoName] = useState(String);
-  const [dataLoading, setDataLoading] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const[explaination,setExplanation] = useState<object>();
-  const [expLoading, setExpLoading] = useState(false);
-  
+function Page() {
+  const [data,setData]= useState<object>();
+  const [explanations,setExplanations]= useState<object>()
+  const [repoName,setRepoName]= useState<string>()
+  const [userName,setUserName]= useState<string>()
+  const [selectedFile,setSelectedFile]= useState<string>()
 
-  const getRepo = async () => {
-    setDataLoading(true);
-    if (repoName == null || userName == null) {
-      return null;
+  const GetRepo =async()=>{
+    if(userName==null || repoName==null ){
+      return
     }
-    const c = localStorage.getItem(`${userName}/${repoName}`);
-    if (c == null) {
+    const d = localStorage.getItem(`${userName}/${repoName}`)
+    if(d==null){
       try {
-        await fetchDirectoryContents(userName, repoName).then((content) => {
-          if (content == null) {
-            console.log("error fetching");
-          } else {
-            setData(content);
-            localStorage.setItem(
-              `${userName}/${repoName}`,
-              JSON.stringify(content)
-            );
+        await fetchDirectoryContents(userName,repoName).then((data)=>{
+          if(data==null){
+            console.log("Cannot fetch")
+          }else{
+            setData(data)
+            localStorage.setItem(`${userName}/${repoName}`,JSON.stringify(data))
+            Object.keys(data).forEach((key)=>{
+              if(hasREADME(key)){
+                setSelectedFile(key);
+              }
+            })
           }
-        });
+        })
       } catch (error) {
-        console.log("error fetching");
+        
+    }
+  }else{
+    setData(JSON.parse(d))
+  }
+    
+  }
+
+  const LoadExp = async()=>{
+    // const cache = localStorage.getItem(`${selectedFile}`)
+    const cache = null
+    if(selectedFile==null){
+      return
+    }
+    if(cache == null){
+      try {
+        if(hasREADME(selectedFile)){
+          await axios.post('api/users/askgeminitext',{prompt:readMePrompt()}).then((res)=>{
+            const d = explanations 
+            // d[`${selectedFile}`] = res.data.message
+            // setExplanations({...d})
+            setExplanations({...explanations,selectedFile:res.data.message})
+            localStorage.setItem(`${selectedFile}`,res.data.message)
+          })
+        }else{
+          await axios.post('api/users/askgeminitext',{prompt:FilePrompt()}).then((res)=>{
+            setExplanations({...explanations,selectedFile:res.data.message})
+            localStorage.setItem(`${selectedFile}`,res.data.message)
+          })
+        }
+      } catch (error) {
+        
       }
-    } else {
-      setData(JSON.parse(c));
+    }else{
+      setExplanations({...explanations,selectedFile:cache})
     }
-    setDataLoading(false);
-    localStorage.clear();
-  };
-
-  function ReadMePrompt(readme){
-    const a = "explain the project and what it does and technology from the given read me section \n give the response as a HTML markup with proper html tags \n" + readme
-    return a
+    
   }
-
-  function FilePrompt(file){
-    const a = "explain the project and what it does and technology from the given read me section \n" + file
-    return a
-  }
-
-
- async function ExpLoad(d,type){
-  setExpLoading(true)
-    if(type=="README"){
-      await axios.post('api/users/askgeminitext', {prompt: ReadMePrompt(d) }).then((response)=>{
-        setExplanation({...explaination,"README.md":response.data.message})
-        })
-    }
-    else if(type=="FILE"){
-      await axios.post('api/users/askgeminitext', {prompt: FilePrompt(d) }).then((response)=>{
-        setExplanation({...explaination,d:response.data.message})
-        })
-    }
-    setExpLoading(false)
-  }
-
-  const FileChange = async()=>{
-    if(selectedFile !=null){
-      await ExpLoad(selectedFile,"FILE")
-    }else if(selectedFile !=null && hasREADME(selectedFile)){
-      await ExpLoad(selectedFile,"README");
-    }
-  }
-
 
   useEffect(()=>{
-    FileChange()
+    if(selectedFile !=null){
+      setExplanations(null);  
+      LoadExp()
+    }
   },[selectedFile])
 
 
+  function readMePrompt() {
+    const a = "Analyze the given README.md file and provide a comprehensive explanation of the project it describes. Include details about the project's purpose, functionalities, installation instructions, usage steps, and any relevant contributing guidelines. Additionally, identify any links or references mentioned in the Readme that could be helpful for further exploration. give in plain text ,remove all highlighting" + data[selectedFile]
+    return a
+  }
+
+  
+  function FilePrompt() {
+    const a = " Analyze the code in <selected file> and provide detailed explanations for each function defined within the file. Explain the purpose of each function, its parameters, return values (if any), and the logic it implements. Additionally, identify any internal function calls or dependencies between functions.. give in plain text ,remove all highlighting" + data[selectedFile]
+    return a
+  }
+
+  function hasREADME(string: string) {
+    const regex = /README\.md/i; // i flag for case-insensitive search
+    return regex.test(string);
+  }
+
+useEffect(()=>{
+localStorage.clear()
+},[])
 
 
-
-  useEffect(()=>{
-    if(data){
-        Object.keys(data).map(async (key)=>{
-            if(hasREADME(key)){
-                setSelectedFile(key);
-                if(data[key]){
-                  await ExpLoad(data[key],"README");
-                }
-            }
-            return null
-        })
-    }
-  },[data])
 
   return (
     <>
-      <input
-        type="text"
-        placeholder="username"
-        value={userName}
-        onChange={(e) => {e.preventDefault();setUserName(e.target.value)}}
-        name=""
-        id=""
-      />
-      <input
-        type="text"
-        placeholder="repo name"
-        value={repoName}
-        onChange={(e) => {e.preventDefault();setRepoName(e.target.value)}}
-        name=""
-        id=""
-      />
-      <button onClick={getRepo}> get </button>
+    <input  value={userName} onChange={(e)=>{setUserName(e.target.value)}} type="text" name="" id="" />
+    <input value={repoName} onChange={(e)=>{setRepoName(e.target.value)}} type="text" name="" id="" />
+  <button onClick={(e)=>{e.preventDefault();setData(null);GetRepo()}}>getrepo</button>
 
-      <div className=" flex flex-row">
-        {dataLoading ? (
-          <>
-            <CircularProgress color="secondary" />
-          </>
-        ) : (
-          <>
-            <div>
-              {data &&
-                Object.keys(data).map((key) => {
-                  return <div  key={key} className="flex flex-col">
-                <button onClick={(e)=>{e.preventDefault();setSelectedFile(key)} }> <p >{key}</p> </button>
-                  </div> 
-                })}
-            </div>
-            <div>{data && Object.keys(data).map((key:any)=>{
-                if(selectedFile == key)
-                {
-                return  <pre key={key} >{data[selectedFile]} </pre>
-            }
-                
-            }) }</div>
-            <div> 
-              {expLoading ? <>
-              dataLoading.....
-              </> : <> 
-                { explaination && 
-                  Object.keys(explaination).map((key) => {
-                    return <div dangerouslySetInnerHTML={{__html:explaination[key]}} key={key}></div>
-                  })
-                }
-              </>}
-            </div>
-          </>
-        )}
-      </div>
+
+<div className='flex flex-col'>
+    <div>
+    {data && Object.keys(data).map((key)=>{
+      return <button onClick={(e)=>{e.preventDefault();setSelectedFile(key)}} key={key} > <p>{key}</p> </button>
+    })}
+    </div>
+
+
+    <div>
+      {data && Object.keys(data).map((key)=>{
+          if(key == selectedFile)
+          return <pre key={key}> {data[key]} </pre>
+      })}
+    </div>
+
+    <div>
+      {explanations && Object.keys(explanations).map((key)=>{
+        console.log(key , selectedFile)
+        // return <div dangerouslySetInnerHTML={{ __html: explanations[key]}} />
+        return <pre  key={key}>{explanations[key]} </pre>
+      })}
+    </div>
+
+</div>
+
     </>
-  );
+  )
 }
 
-export default page;
-
-
-function hasREADME(string: string) {
-    const regex = /README\.md/i; // i flag for case-insensitive search
-    return regex.test(string);
-}
-
+export default Page
 
