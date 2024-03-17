@@ -2,31 +2,31 @@ const axios = require('axios');
 
 
 
-const token = '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';
+const token = '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';
 const headers = {
     'Authorization': `token ${token}`,
     'X-GitHub-Api-Version': '2022-11-28'
 };
 
-export default async function fetchDirectoryContents(owner, repo, path = '') {
-    const Data = {
+export default async function fetchDirectoryContents(owner, repo, data={} ,path = '') {
+    
 
-    }
     try {
-            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
         const response = await axios.get(url, { headers });
         
 
         for (const item of response.data) {
             if (item.type === 'dir' ) {
-                Data[item.path] = "DIR"
-                await fetchDirectoryContents(owner, repo, item.path); 
+                data[item.path] = "DIR"
+                await fetchDirectoryContents(owner, repo,data, item.path); 
             } else if (item.type === 'file') {
                 const fileContent = await fetchFileContents(owner, repo, item.path);
-                Data[item.path] = fileContent
+                data[item.path] = fileContent
             }
         }
-        return Data
+        console.log(data);
+        return data
 
     } catch (error) {
         console.error('Error fetching directory contents:', error.response ? error.response.data : error.message);
@@ -46,6 +46,3 @@ async function fetchFileContents(owner, repo, filePath) {
         return null;
     }
 }
-
-const owner = 'RishiKumarGade'; 
-const repo = 'Cobalt';

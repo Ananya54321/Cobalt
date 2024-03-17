@@ -6,8 +6,8 @@ import fetchDirectoryContents from '@/helpers/github/gitApi'
 function Page() {
   const [data,setData]= useState<object>();
   const [explanations,setExplanations]= useState<object>()
-  const [repoName,setRepoName]= useState<string>()
-  const [userName,setUserName]= useState<string>()
+  const [repoName,setRepoName]= useState<string>("")
+  const [userName,setUserName]= useState<string>("")
   const [selectedFile,setSelectedFile]= useState<string>()
 
   const GetRepo =async()=>{
@@ -22,6 +22,7 @@ function Page() {
             console.log("Cannot fetch")
           }else{
             setData(data)
+            console.log(data)
             localStorage.setItem(`${userName}/${repoName}`,JSON.stringify(data))
             Object.keys(data).forEach((key)=>{
               if(hasREADME(key)){
@@ -94,9 +95,9 @@ function Page() {
     return regex.test(string);
   }
 
-useEffect(()=>{
-localStorage.clear()
-},[])
+// useEffect(()=>{
+// localStorage.clear()
+// },[])
 
 
 
@@ -107,7 +108,7 @@ localStorage.clear()
   <button onClick={(e)=>{e.preventDefault();setData(null);GetRepo()}}>getrepo</button>
 
 
-<div className='flex flex-col'>
+<div className='flex flex-row'>
     <div>
     {data && Object.keys(data).map((key)=>{
       return <button onClick={(e)=>{e.preventDefault();setSelectedFile(key)}} key={key} > <p>{key}</p> </button>
