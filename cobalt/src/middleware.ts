@@ -47,5 +47,6 @@ export const config = {
     '/prompt',
     '/snippet',
     '/guide',
+    '/mysnippets'
   ]
 }

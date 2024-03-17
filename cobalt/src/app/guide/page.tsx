@@ -3,6 +3,7 @@ import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react'
 import fetchDirectoryContents from '@/helpers/github/gitApi'
 import Link from 'next/link';
+import SnippetComponent from './SnippetComponent';
 
 function Page() {
   const [data,setData]= useState<object>();
@@ -10,10 +11,12 @@ function Page() {
   const [repoName,setRepoName]= useState<string>("")
   const [userName,setUserName]= useState<string>("")
   const [selectedFile,setSelectedFile]= useState<string>()
-  const codeRef = useRef(null)
-
   const [selectedText, setSelectedText] = useState('');
   const [buttonPosition, setButtonPosition] = useState({ x: 0, y: 0 });
+  const [snippetBox, setSnippetBox] = useState(false)
+  const [repLoading,setRepoLoading] = useState(false)
+  const [expLoading,setExpLoading] = useState(false);
+  const [recentRepos,setRecentRepos] = useState<Array<String>>();
 
   const handleSelection = () => {
     const selection = window.getSelection();
@@ -26,12 +29,14 @@ function Page() {
     }
   };
 
-  useEffect
+
 
   const GetRepo =async()=>{
     if(userName==null || repoName==null ){
       return
     }
+    setRepoLoading(true)
+    setRecentRepos([...recentRepos,`${userName}/${repoName}`])
     const d = localStorage.getItem(`${userName}/${repoName}`)
     if(d==null){
       try {
@@ -55,10 +60,15 @@ function Page() {
   }else{
     setData(JSON.parse(d))
   }
-    
+    setRepoLoading(false)
   }
 
+  useEffect(()=>{
+    localStorage.setItem("recentRepos",JSON.stringify(recentRepos));
+  },[recentRepos])
+
   const LoadExp = async()=>{
+    setExpLoading(true)
     // const cache = localStorage.getItem(`${selectedFile}`)
     const cache = null
     if(selectedFile==null){
@@ -86,7 +96,7 @@ function Page() {
     }else{
       setExplanations({...explanations,selectedFile:cache})
     }
-    
+    setExpLoading(false)
   }
 
   useEffect(()=>{
@@ -109,29 +119,39 @@ function Page() {
   }
 
   function hasREADME(string: string) {
-    const regex = /README\.md/i; // i flag for case-insensitive search
+    const regex = /README\.md/i;
     return regex.test(string);
   }
 
-  const saveSnippet = async()=>{
-    try {
-      await axios.post('api/users/askgeminitext',{})
-    } catch (error) {
-      
-    }
-  }
+
+  useEffect(()=>{
+    setRecentRepos(localStorage.getItem('recentRepos')|| null)
+  },[])
 
   return (
     <>
     <input  value={userName} onChange={(e)=>{setUserName(e.target.value)}} type="text" name="" id="" />
     <input value={repoName} onChange={(e)=>{setRepoName(e.target.value)}} type="text" name="" id="" />
+    {repLoading ? <>
+  <button disabled onClick={(e)=>{e.preventDefault();setData(null);GetRepo()}}>getrepo</button>
+    </> :<>
   <button onClick={(e)=>{e.preventDefault();setData(null);GetRepo()}}>getrepo</button>
+    </>}
 
+{repLoading ? <>
+
+repo loading......
+
+</> : <>
 
 <div className='flex flex-row'>
     <div>
     {data && Object.keys(data).map((key)=>{
-      return <button onClick={(e)=>{e.preventDefault();setSelectedFile(key)}} key={key} > <p>{key}</p> </button>
+      if(expLoading){
+        return <button disabled onClick={(e)=>{e.preventDefault();setSelectedFile(key)}} key={key} > <p>{key}</p> </button>
+      }else{
+        <button onClick={(e)=>{e.preventDefault();setSelectedFile(key)}} key={key} > <p>{key}</p> </button>
+      }
     })}
     </div>
 
@@ -143,20 +163,35 @@ function Page() {
       })}
       {selectedText && (
         <div className='bg-slate-700' style={{ position: 'absolute', top: buttonPosition.y, left: buttonPosition.x }}>
-          <Link href={`snippet?code=${encodeURIComponent(selectedText)}`} >Action</Link>
+          <button onClick={()=>{setSnippetBox(true)}}>Action</button>
         </div>
       )}
     </div>
 
     <div>
-      {explanations && Object.keys(explanations).map((key)=>{
-        console.log(key , selectedFile)
-        // return <div dangerouslySetInnerHTML={{ __html: explanations[key]}} />
+      {snippetBox ? <>
+      <button onClick={()=>{setSnippetBox(false)}}> close </button>
+      <SnippetComponent code={selectedText}  /> 
+      </> : 
+      <>
+      {
+        expLoading ? <>
+        
+        Exp Loading.......
+        </> : <>
+        
+        {explanations && Object.keys(explanations).map((key)=>{
         return <pre  key={key}>{explanations[key]} </pre>
       })}
+      </>}
+        </>
+      }
+      
     </div>
-
 </div>
+
+</>}
+
 
     </>
   )
