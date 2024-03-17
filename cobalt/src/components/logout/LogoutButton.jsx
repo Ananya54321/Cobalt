@@ -16,8 +16,6 @@ export default function LogoutButton() {
   }
 
   return (
-    <div>
       <button onClick={e=>{onLogout()}} >logout</button>
-    </div>
   );
 }

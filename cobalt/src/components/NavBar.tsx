@@ -1,7 +1,22 @@
+'use client'
+import GetUser from "@/helpers/GetUser"
+import { useEffect, useState } from "react";
+import LogoutButton from "@/components/logout/LogoutButton"
+
 export default function NavBar(){
 
+  const [user,setUser] = useState(null);
+  useEffect(()=>{
+    GetUserDetails();
+  },[])
 
-  
+
+  async function GetUserDetails(){
+    await GetUser().then(res=>{
+      setUser(res)
+    }) 
+
+  }
 
     return (
         <div>
@@ -39,16 +54,33 @@ export default function NavBar(){
               About us
             </a>
           </li>
-          <li>
+
+          {user==null ? <> 
+            <li>
             <a href="#" className="hover:text-orange-500">
-              Logout
+            Signup
             </a>
           </li>
           <li>
             <a href="#" className="hover:text-orange-500">
-              Login/Signup
+              Login
             </a>
           </li>
+          </>:  <> 
+          
+          <li>
+            <a href="#" className="hover:text-orange-500">
+              {user.username}
+            </a>
+          </li>
+          <li>
+            <a href="#" className="hover:text-orange-500">
+              <LogoutButton/>
+            </a>
+          </li>
+          </>}
+          
+          
         </ul>
       </nav>
     </header></div>)
