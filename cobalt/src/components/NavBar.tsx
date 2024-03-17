@@ -80,7 +80,6 @@ export default function NavBar(){
           </li>
           </>}
           
-          
         </ul>
       </nav>
     </header></div>)
