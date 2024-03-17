@@ -2,6 +2,7 @@
 import React, { useState ,useEffect} from "react";
 import axios from 'axios';
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 export default function SnippetComponent({code}){
   
 
@@ -18,7 +19,7 @@ export default function SnippetComponent({code}){
         title:"",
         description:"",
         code:"",
-        tags: [] // Change tags to an array
+        tags: [] 
     })
     const [tagInput, setTagInput] = useState('');
   
@@ -55,8 +56,12 @@ export default function SnippetComponent({code}){
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-          await axios.post('api/users/addsnippet', snippetData).then(()=>{
-                router.back();
+          await axios.post('api/users/addsnippet', snippetData).then((res)=>{
+            if(res.data.success == false){
+                toast.error("Please Login")
+                router.push('/login')
+                return
+              }
           })
             console.log('Sending data to MongoDB:', snippetData);
             

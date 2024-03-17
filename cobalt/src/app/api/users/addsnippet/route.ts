@@ -13,7 +13,14 @@ export async function POST(request:NextRequest){
         const reqBody = await request.json()
         const {code,description,title,tags} = reqBody
         const userId = getDataFromToken(request)
-
+        if(userId == null){
+            console.log(true)
+            const response = NextResponse.json({
+                message:'snippets  not found',
+                success:false
+            });
+            return response
+        }
         await Snippet.create({
             userId:userId,code:code,description:description,title:title,tags:tags
         })

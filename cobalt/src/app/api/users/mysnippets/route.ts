@@ -13,13 +13,23 @@ connect()
 export async function GET(request:NextRequest) {
     try {
         const userId = await getDataFromToken(request)
-        const snippets = await Snippet.find({userId:userId})
+        if(userId == null){
+            console.log(true)
             const response = NextResponse.json({
-                message:'sessions found',
+                message:'snippets  not found',
+                success:false
+            });
+            return response
+        }else{
+            const snippets = await Snippet.find({userId:userId})
+            const response = NextResponse.json({
+                message:'snippets found',
                 snippets: snippets,
             })
             
             return response
+        }
+        
         } catch (error:any) {
             return NextResponse.json({error: error.message })
         }

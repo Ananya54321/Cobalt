@@ -68,7 +68,7 @@ function Page() {
     <>
     <div>
       <input type="text" onChange={(e)=>{setFilter({...filter,title:e.target.value})}}  name="" id="" />
-      <input type="text" onChange={(e)=>{setFilter({...filter,description:e.target.value})}}  name="" id="" />
+      {/* <input type="text" onChange={(e)=>{setFilter({...filter,description:e.target.value})}}  name="" id="" /> */}
       <input type="text" onChange={(e)=>{setFilter({...filter,tag:e.target.value})}}  name="" id="" />
     </div>
         <div>

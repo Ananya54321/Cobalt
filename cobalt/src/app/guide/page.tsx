@@ -4,8 +4,10 @@ import React, { useEffect, useRef, useState } from 'react'
 import fetchDirectoryContents from '@/helpers/github/gitApi'
 import Link from 'next/link';
 import SnippetComponent from './SnippetComponent';
+import toast from 'react-hot-toast';
 
 function Page() {
+  const [repoLink,setRepoLink] = useState<string>("");
   const [data,setData]= useState<object>();
   const [explanations,setExplanations]= useState<object>()
   const [repoName,setRepoName]= useState<string>("")
@@ -29,14 +31,27 @@ function Page() {
     }
   };
 
+  useEffect(()=>{
+    if(repoLink.startsWith("https://")){
+      setRepoLink(repoLink.replace("https://",""))
+    }
+    setUserName(repoLink.split('/')[1])
+    setRepoName(repoLink.split('/')[2])
+  },[repoLink])
+
 
 
   const GetRepo =async()=>{
-    if(userName==null || repoName==null ){
+    
+    // if(userName==null || repoName==null ){
+    //   return
+    // }
+    if(repoLink==null || repoLink == ""){
       return
     }
+    
     setRepoLoading(true)
-    setRecentRepos([...recentRepos,`${userName}/${repoName}`])
+    // setRecentRepos([...recentRepos,`${userName}/${repoName}`])
     const d = localStorage.getItem(`${userName}/${repoName}`)
     if(d==null){
       try {
@@ -45,7 +60,6 @@ function Page() {
             console.log("Cannot fetch")
           }else{
             setData(data)
-            console.log(data)
             localStorage.setItem(`${userName}/${repoName}`,JSON.stringify(data))
             Object.keys(data).forEach((key)=>{
               if(hasREADME(key)){
@@ -78,9 +92,7 @@ function Page() {
       try {
         if(hasREADME(selectedFile)){
           await axios.post('api/users/askgeminitext',{prompt:readMePrompt()}).then((res)=>{
-            const d = explanations 
-            // d[`${selectedFile}`] = res.data.message
-            // setExplanations({...d})
+           
             setExplanations({...explanations,selectedFile:res.data.message})
             localStorage.setItem(`${selectedFile}`,res.data.message)
           })
@@ -122,16 +134,20 @@ function Page() {
     const regex = /README\.md/i;
     return regex.test(string);
   }
+  
+
 
 
   useEffect(()=>{
-    setRecentRepos(localStorage.getItem('recentRepos')|| null)
+    // setRecentRepos(localStorage.getItem('recentRepos')|| null)
+    // localStorage.clear();
   },[])
 
   return (
     <>
-    <input  value={userName} onChange={(e)=>{setUserName(e.target.value)}} type="text" name="" id="" />
-    <input value={repoName} onChange={(e)=>{setRepoName(e.target.value)}} type="text" name="" id="" />
+    <input type="text" value={repoLink} onChange={(e)=>{setRepoLink(e.target.value)}} name="" id="" />
+    {/* <input  value={userName} onChange={(e)=>{setUserName(e.target.value)}} type="text" name="" id="" /> */}
+    {/* <input value={repoName} onChange={(e)=>{setRepoName(e.target.value)}} type="text" name="" id="" /> */}
     {repLoading ? <>
   <button disabled onClick={(e)=>{e.preventDefault();setData(null);GetRepo()}}>getrepo</button>
     </> :<>
@@ -150,7 +166,7 @@ repo loading......
       if(expLoading){
         return <button disabled onClick={(e)=>{e.preventDefault();setSelectedFile(key)}} key={key} > <p>{key}</p> </button>
       }else{
-        <button onClick={(e)=>{e.preventDefault();setSelectedFile(key)}} key={key} > <p>{key}</p> </button>
+        return <button onClick={(e)=>{e.preventDefault();setSelectedFile(key)}} key={key} > <p>{key}</p> </button>
       }
     })}
     </div>
