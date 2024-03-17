@@ -43,9 +43,6 @@ function Page() {
 
   const GetRepo =async()=>{
     
-    // if(userName==null || repoName==null ){
-    //   return
-    // }
     if(repoLink==null || repoLink == ""){
       return
     }
@@ -143,6 +140,10 @@ function Page() {
     // localStorage.clear();
   },[])
 
+
+
+
+
   return (
     <>
     <input type="text" value={repoLink} onChange={(e)=>{setRepoLink(e.target.value)}} name="" id="" />
@@ -161,7 +162,10 @@ repo loading......
 </> : <>
 
 <div className='flex flex-row'>
-    <div>
+    <div className='flex flex-col'>
+
+
+
     {data && Object.keys(data).map((key)=>{
       if(expLoading){
         return <button disabled onClick={(e)=>{e.preventDefault();setSelectedFile(key)}} key={key} > <p>{key}</p> </button>
@@ -179,7 +183,8 @@ repo loading......
       })}
       {selectedText && (
         <div className='bg-slate-700' style={{ position: 'absolute', top: buttonPosition.y, left: buttonPosition.x }}>
-          <button onClick={()=>{setSnippetBox(true)}}>Action</button>
+          <button onClick={()=>{setSnippetBox(true)}}>Action</button> 
+          {/* opens snippet box */}
         </div>
       )}
     </div>
