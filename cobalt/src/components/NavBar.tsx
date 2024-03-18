@@ -57,17 +57,16 @@ export default function NavBar(){
 
           {user==null ? <> 
             <li>
-            <a href="#" className="hover:text-orange-500">
+            <a href="/signup" className="hover:text-orange-500">
             Signup
             </a>
           </li>
           <li>
-            <a href="#" className="hover:text-orange-500">
+            <a href="/login" className="hover:text-orange-500">
               Login
             </a>
           </li>
           </>:  <> 
-          
           <li>
             <a href="#" className="hover:text-orange-500">
               {user.username}

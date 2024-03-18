@@ -18,7 +18,7 @@ export default function SnippetComponent(){
         e.preventDefault();
         
         if (tagInput.trim() !== '') {
-            setSnippetData(prevData => ({
+            setSnippetData((prevData:any) => ({
                 ...prevData,
                 tags: [...prevData.tags, tagInput.trim()] 
             }));
@@ -69,6 +69,6 @@ export default function SnippetComponent(){
                 <button onClick={addTag}>Add Tag</button>
                 <button type="submit">Add Snippet</button>
             </form>
-        </div>
-    );
+       </div>
+    );
 }
