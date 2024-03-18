@@ -20,7 +20,7 @@ export async function GET(request:NextRequest) {
             })
             
         }
-        const user = await User.find({_id:userId})
+        const user = await User.findOne({_id:userId})
 
             const response = NextResponse.json({
                 message:'user found',

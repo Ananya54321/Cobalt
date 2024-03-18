@@ -39,22 +39,17 @@ export default function NavBar(){
               Guide
             </a>
           </li>
-          <li>
+          {/* <li>
             <a href="/snippet" className="hover:text-orange-500">
               Add Snippet
             </a>
-          </li>
-          <li>
-            <a href="/snippet" className="hover:text-orange-500">
-              View Snippet
-            </a>
-          </li>
+          </li> */}
+         
           <li>
             <a href="#" className="hover:text-orange-500">
-              About us
+              About Us
             </a>
           </li>
-
           {user==null ? <> 
             <li>
             <a href="/signup" className="hover:text-orange-500">
@@ -68,14 +63,17 @@ export default function NavBar(){
           </li>
           </>:  <> 
           <li>
+            <a href="/mysnippets" className="hover:text-orange-500">
+              Snippets
+            </a>
+          </li>
+          <li>
             <a href="#" className="hover:text-orange-500">
               {user.username}
             </a>
           </li>
           <li>
-            <a href="#" className="hover:text-orange-500">
               <LogoutButton/>
-            </a>
           </li>
           </>}
           

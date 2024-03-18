@@ -10,7 +10,7 @@ async function GetUser() {
             if(res.data.success == false){
                 return null
             }else{
-                User == res.data.user
+                User = res.data.user
             }
         })
   return User
