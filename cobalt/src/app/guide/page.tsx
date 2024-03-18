@@ -10,6 +10,10 @@ import Image from "next/image";
 import search from "@/Images/whitesearch.svg";
 import { PiCode } from "react-icons/pi";
 import { Button } from "@/components/ui/button";
+import HashLoader from "react-spinners/HashLoader";
+import { IoMdClose } from "react-icons/io";
+import RingLoader from "react-spinners/RingLoader";
+
 
 function Page() {
   const [repoLink, setRepoLink] = useState<string>("");
@@ -22,6 +26,7 @@ function Page() {
   const [buttonPosition, setButtonPosition] = useState({ x: 0, y: 0 });
   const [snippetBox, setSnippetBox] = useState(false);
   const [repLoading, setRepoLoading] = useState(false);
+  const [codeLoading, setCodeLoading] = useState(false);
   const [expLoading, setExpLoading] = useState(false);
   const [recentRepos, setRecentRepos] = useState<Array<String>>();
 
@@ -54,7 +59,7 @@ function Page() {
 
     setRepoLoading(true);
     // setRecentRepos([...recentRepos,${userName}/${repoName}])
-    const d = localStorage.getItem(`${userName}/${repoName}`);
+    const d = localStorage.getItem(${userName}/${repoName});
     if (d == null) {
       try {
         await fetchDirectoryContents(userName, repoName).then((data) => {
@@ -63,7 +68,7 @@ function Page() {
           } else {
             setData(data);
             localStorage.setItem(
-              `${userName}/${repoName}`,
+              ${userName}/${repoName},
               JSON.stringify(data)
             );
             Object.keys(data).forEach((key) => {
@@ -101,7 +106,7 @@ function Page() {
                 ...explanations,
                 selectedFile: res.data.message,
               });
-              localStorage.setItem(`${selectedFile}`, res.data.message);
+              localStorage.setItem(${selectedFile}, res.data.message);
             });
         } else {
           await axios
@@ -111,7 +116,7 @@ function Page() {
                 ...explanations,
                 selectedFile: res.data.message,
               });
-              localStorage.setItem(`${selectedFile}`, res.data.message);
+              localStorage.setItem(${selectedFile}, res.data.message);
             });
         }
       } catch (error) {}
@@ -165,7 +170,7 @@ function Page() {
           }}
           name=""
           id=""
-          className=" px-4 py-2 mt-8 h-10 min-w-[400px] bg-[#1e293b] rounded-md text-[#8f9eb3] focus:outline-none focus:ring focus:ring-opacity-40"
+          className=" px-4 py-2 mt-8 h-10 min-w-[400px] bg-[#1e293b] rounded-md text-[#8f9eb3] focus:outline-none focus:ring focus:ring-opacity-60"
         />
         {repLoading ? (
           <>
@@ -250,42 +255,47 @@ function Page() {
               
                 {selectedText && (
                   <div
-                    className="bg-slate-700"
+                    className=""
                     style={{
                       position: "absolute",
                       top: buttonPosition.y,
                       left: buttonPosition.x,
                     }}
                   >
-                    <button className="bg-slate-200/60 p-1 rounded-md shadow-lg border border-gray text-black"
+                    <Button className=" w-20 p-1"
+                    variant = "snipbutton"
                       onClick={() => {
                         setSnippetBox(true);
                       }}
                     >
-                      Action
-                    </button>
+                      Snip
+                    </Button>
                     {/* opens snippet box */}
                   </div>
                 )}
               </div>
             </div>
-            <div className="bg-[#264F9460] col-span-3 m-6 rounded-2xl text-white h-[550px]  overflow-y-auto custom-scrollbar hover:border">
+            <div className="bg-[#264F9460] col-span-3 m-6 rounded-2xl text-white h-[550px] overflow-y-auto custom-scrollbar hover:border">
               {snippetBox ? (
                 <>
-                  <button
+                  <Button
+                  variant="snipbutton"
+                  className="w-10 p-1 rounded-full m-3 mb-0 fixed"
                     onClick={() => {
                       setSnippetBox(false);
                     }}
                   >
                     {" "}
-                    close{" "}
-                  </button>
+                    <IoMdClose className="h-5 w-5 inline" />{" "}
+                  </Button>
                   <SnippetComponent code={selectedText} />
                 </>
               ) : (
                 <>
                   {expLoading ? (
-                    <>Exp Loading.......</>
+                    // <div ><HashLoader color="#2196f3" size={100} /></div>
+                    <div className="flex items-center justify-center h-[550px]"><RingLoader color="#2196f3" size={100} /></div>
+
                   ) : (
                     <>
                       {explanations &&
