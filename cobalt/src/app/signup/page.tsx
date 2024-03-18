@@ -4,12 +4,8 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import Image from "next/image";
-import "@/cssFiles/homeanimations.css";
 import { Button } from "@/components/ui/button";
-
-import { Input } from "@/components/ui/input"
-
+import { Input } from "@/components/ui/input";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -76,79 +72,88 @@ export default function SignupPage() {
 
   return (
     <>
-      <h1 className="text-3xl mt-5 font-semibold">
-        {loading ? "processing" : "Create new Account"}
-      </h1>
-      <form className="mt-6 text-left">
-        <div className="mb-2">
-          <label className="block text-sm font-semibold ">
-            UserName
-          </label>
-          <Input
-            value={user.username}
-            onChange={(e) => setUser({ ...user, username: e.target.value })}
-            type="text"
-            className="w-40"
-          />
+      <div
+        className="min-h-screen flex justify-center items-center bg-gray-900"
+        style={{
+          backgroundImage: `url("https://images.unsplash.com/photo-1505506874110-6a7a69069a08?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        <div className="w-full max-w-md bg-gray-800 p-8 rounded-3xl shadow-xl animate-fadeIn">
+          <h1 className="text-3xl font-semibold text-center text-white mb-4">
+            {loading ? "Processing" : "Create new Account"}
+          </h1>
+          <form className="mt-6 space-y-4">
+            <div className="transition-transform duration-300 ease-in-out transform hover:scale-105">
+              <label className="block text-sm font-semibold text-gray-300">
+                Username
+              </label>
+              <Input
+                value={user.username}
+                onChange={(e) =>
+                  setUser({ ...user, username: e.target.value })
+                }
+                type="text"
+                placeholder="Enter your username"
+                className="w-full rounded-md bg-gray-700 text-gray-200 px-4 py-2 focus:outline-none focus:ring focus:border-blue-500 transition-colors duration-300 hover:bg-gray-600"
+              />
+            </div>
+            <div className="transition-transform duration-300 ease-in-out transform hover:scale-105">
+              <label className="block text-sm font-semibold text-gray-300">
+                Email
+              </label>
+              <Input
+                value={user.email}
+                onChange={(e) => setUser({ ...user, email: e.target.value })}
+                type="email"
+                placeholder="Enter your email"
+                className="w-full rounded-md bg-gray-700 text-gray-200 px-4 py-2 focus:outline-none focus:ring focus:border-blue-500 transition-colors duration-300 hover:bg-gray-600"
+              />
+            </div>
+            <div className="transition-transform duration-300 ease-in-out transform hover:scale-105">
+              <label className="block text-sm font-semibold text-gray-300">
+                Password
+              </label>
+              <Input
+                id="password"
+                value={user.password}
+                onChange={(e) =>
+                  setUser({ ...user, password: e.target.value })
+                }
+                type="password"
+                placeholder="Enter your password"
+                className="w-full rounded-md bg-gray-700 text-gray-200 px-4 py-2 focus:outline-none focus:ring focus:border-blue-500 transition-colors duration-300 hover:bg-gray-600"
+              />
+            </div>
+            <p className="text-gray-300 flex items-center justify-between">
+              <Link href="/forgotpassword" className="hover:underline">
+                Forgot password?
+              </Link>
+              <label htmlFor="remember" className="font-semibold">
+                <input type="checkbox" id="remember" className="mr-1" />
+                Remember me
+              </label>
+            </p>
+            <Button
+              onClick={(e) => {
+                e.preventDefault();
+                onSignup();
+              }}
+              disabled={buttonDisabled}
+              className="w-full py-2 rounded-md bg-blue-500 text-white font-semibold hover:bg-blue-600 transition-all duration-300"
+            >
+              {loading ? "Processing" : "Sign up"}
+            </Button>
+          </form>
+          <p className="text-gray-300 mt-4">
+            Already have an account?{" "}
+            <Link href="/login" className="hover:underline">
+              Login
+            </Link>
+          </p>
         </div>
-        <div className="mb-2">
-          <label className="block text-sm font-semibold ">
-            Email
-          </label>
-          <Input
-            value={user.email}
-            onChange={(e) => setUser({ ...user, email: e.target.value })}
-            type="email"
-            className="w-40"
-          />
-        </div>
-        <div className="mb-2">
-          <label className="block text-sm font-semibold ">
-            Password
-          </label>
-          <Input
-            id="password"
-            value={user.password}
-            onChange={(e) => setUser({ ...user, password: e.target.value })}
-            type="password"
-            className="w-40"
-          />
-        </div>
-        <p className="">
-          <Link
-            href="/forgotpassword"
-            className=" font-semibold hover:underline mr-4"
-          >
-            Forgot password?
-          </Link>
-          <label htmlFor="remember" className=" font-semibold">
-            <input type="checkbox" id="remember" className="mr-1" />
-            Remember me
-          </label>
-        </p>
-        <div className="mt-6">
-          <Button
-            variant="codeeditor"
-            onClick={(e) => {
-              e.preventDefault();
-              onSignup();
-            }}
-          >
-            {buttonDisabled ? "Fill the details" : "signup"}
-          </Button>
-        </div>
-      </form>
-      <p>
-        {" "}
-        Already have an account?{" "}
-        <Link
-          href="/login"
-          className='" font-semibold hover:underline'
-        >
-          Login!
-        </Link>
-      </p>
-
+      </div>
     </>
   );
 }

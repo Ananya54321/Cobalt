@@ -26,7 +26,7 @@ export default function NavBar(){
             </a>
           </li>
           <li>
-            <a href="/snippet" className="hover:text-orange-500">
+            <a href="/mysnippets" className="hover:text-orange-500">
               View Snippet
             </a>
           </li>
