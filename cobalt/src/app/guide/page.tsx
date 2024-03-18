@@ -8,6 +8,8 @@ import toast from "react-hot-toast";
 import NavBar from "@/components/NavBar";
 import Image from "next/image";
 import search from "@/Images/whitesearch.svg";
+import { PiCode } from "react-icons/pi";
+import { Button } from "@/components/ui/button";
 
 function Page() {
   const [repoLink, setRepoLink] = useState<string>("");
@@ -30,7 +32,7 @@ function Page() {
       setSelectedText(selectedText);
       const range = selection.getRangeAt(0).getBoundingClientRect();
       const { top, left } = range;
-      setButtonPosition({ x: left, y: top });
+      setButtonPosition({ x: left + 40, y: top });
     }
   };
 
@@ -163,46 +165,51 @@ function Page() {
           }}
           name=""
           id=""
-          className=" px-4 py-2 mt-20 h-10 w-[200px] bg-[#1e293b] rounded-md text-[#8f9eb3] focus:outline-none focus:ring focus:ring-opacity-40"
+          className=" px-4 py-2 mt-8 h-10 min-w-[400px] bg-[#1e293b] rounded-md text-[#8f9eb3] focus:outline-none focus:ring focus:ring-opacity-40"
         />
         {repLoading ? (
           <>
-            <button
+            <Button
               disabled
+            variant="anibutton"
+            className="h-10 mt-8 min-w-[100px] text-md font-semibold"
+
               onClick={(e) => {
                 e.preventDefault();
                 setData(null);
                 GetRepo();
               }}
             >
-              getrepo
-            </button>
+              <span className="relative z-10">Loading...</span>
+              
+            </Button>
           </>
         ) : (
           <>
-            <button
-              className="h-10 mt-20 bg-[#00adf1] rounded-xl min-w-[100px] outline-none cursor-pointer text-lg hover:bg-[#37bcf8] font-semibold text-white"
+            <Button
+            variant="anibutton"
+              className="h-10 mt-8 min-w-[100px] text-md font-semibold"
               onClick={(e) => {
                 e.preventDefault();
                 setData(null);
                 GetRepo();
               }}
             >
-              getrepo
-            </button>
+              <span className="relative z-10">Get Repo</span>
+              
+            </Button>
           </>
         )}
       </div>
 
       {data != null ? (
-        <div className="h-screen">
-          <div className="grid grid-cols-8 h-[700px]">
-            <div className="bg-[#264F9460] col-span-2 m-6 mr-0 rounded-2xl">
-              <div className=" grid grid-cols-6 h-[100%] justify-items-center">
-                <div className="col-span-5 bg-blue-50 w-full m-2 mr-2 rounded-2xl flex flex-col pl-5">
-                  <p>{repoName}</p>
-                  <hr />
-                  <div className="flex flex-col text-left">
+        <div className="">
+          <div className="grid grid-cols-8">
+            <div className="bg-[#264F9460] col-span-2 m-6 mr-0 mb-0 rounded-2xl flex justify-center">
+                <div className="text-white w-5/6 m-2 mr-2 h-[550px] rounded-2xl flex flex-col">
+                  <p className="text-xl p-2 font-mono"> <PiCode className="inline h-7 w-7" /> {repoName.toUpperCase()}</p>
+                  <hr className="mb-5" />
+                  <div className="flex flex-col h-[550px] text-[#b5daff] gap-1 overflow-y-auto custom-scrollbar">
                     {data &&
                       Object.keys(data).map((key) => {
                         return (
@@ -214,21 +221,20 @@ function Page() {
                             key={key}
                           >
                             {" "}
-                            <p>{key}</p>{" "}
+                            <p className="bg-[#40506a] text-left pl-3 py-1 rounded-md hover:border">{key}</p>{" "}
                           </button>
                         );
                       })}
                   </div>
                 </div>
-              </div>
             </div>
-            <div className="bg-[#264F9460] col-span-3 m-6 mr-0 rounded-2xl text-white">
+            <div className="bg-[#264F9460] col-span-3 m-6 mr-0 rounded-2xl text-white h-[550px] p-4 overflow-y-auto custom-scrollbar hover:border ">
               {data &&
                 Object.keys(data).map((key) => {
                   if (key == selectedFile)
                     return (
                       <pre
-                        className="whitespace-pre-wrap"
+                        className="whitespace-pre-wrap font-sans"
                         onMouseUp={handleSelection}
                         onMouseDown={() => {
                           setSelectedText(null);
@@ -241,22 +247,7 @@ function Page() {
                     );
                 })}
               <div>
-                {/* {data &&
-                  Object.keys(data).map((key) => {
-                    if (key == selectedFile)
-                      return (
-                        <pre
-                          onMouseUp={handleSelection}
-                          onMouseDown={() => {
-                            setSelectedText(null);
-                          }}
-                          key={key}
-                        >
-                          {" "}
-                          {data[key]}{" "}
-                        </pre>
-                      );
-                  })} */}
+              
                 {selectedText && (
                   <div
                     className="bg-slate-700"
@@ -266,7 +257,7 @@ function Page() {
                       left: buttonPosition.x,
                     }}
                   >
-                    <button
+                    <button className="bg-slate-200/60 p-1 rounded-md shadow-lg border border-gray text-black"
                       onClick={() => {
                         setSnippetBox(true);
                       }}
@@ -278,7 +269,7 @@ function Page() {
                 )}
               </div>
             </div>
-            <div className="bg-[#264F9460] col-span-3 m-6 rounded-2xl text-white">
+            <div className="bg-[#264F9460] col-span-3 m-6 rounded-2xl text-white h-[550px]  overflow-y-auto custom-scrollbar hover:border">
               {snippetBox ? (
                 <>
                   <button
@@ -300,9 +291,12 @@ function Page() {
                       {explanations &&
                         Object.keys(explanations).map((key) => {
                           return (
-                            <pre className="whitespace-pre-wrap" key={key}>
+                            <div className="p-4">
+                              <pre className="whitespace-pre-wrap font-sans" key={key}>
                               {explanations[key]}{" "}
                             </pre>
+                            </div>
+                            
                           );
                         })}
                     </>
@@ -313,11 +307,11 @@ function Page() {
           </div>
         </div>
       ) : (
-        <div className="flex justify-center items-center mt-16">
+        <div className="flex justify-center items-center">
           <Image
             src={search}
             alt={"search"}
-            className="h-[600px] w-[600px]"
+            className="h-[800px] w-[800px]"
           ></Image>
         </div>
       )}
