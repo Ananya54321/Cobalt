@@ -14,6 +14,7 @@ import HashLoader from "react-spinners/HashLoader";
 import { IoMdClose } from "react-icons/io";
 import RingLoader from "react-spinners/RingLoader";
 
+const InvalidFiles = ['mp3','mp4','gif','jpeg','jpg','png','svg','webp','class','exe']
 
 function Page() {
   const [repoLink, setRepoLink] = useState<string>("");
@@ -59,7 +60,7 @@ function Page() {
 
     setRepoLoading(true);
     // setRecentRepos([...recentRepos,${userName}/${repoName}])
-    const d = localStorage.getItem(${userName}/${repoName});
+    const d = localStorage.getItem(`${userName}/${repoName}`);
     if (d == null) {
       try {
         await fetchDirectoryContents(userName, repoName).then((data) => {
@@ -68,7 +69,7 @@ function Page() {
           } else {
             setData(data);
             localStorage.setItem(
-              ${userName}/${repoName},
+              `${userName}/${repoName}`,
               JSON.stringify(data)
             );
             Object.keys(data).forEach((key) => {
@@ -106,7 +107,7 @@ function Page() {
                 ...explanations,
                 selectedFile: res.data.message,
               });
-              localStorage.setItem(${selectedFile}, res.data.message);
+              // localStorage.setItem(${selectedFile}, res.data.message);
             });
         } else {
           await axios
@@ -116,7 +117,7 @@ function Page() {
                 ...explanations,
                 selectedFile: res.data.message,
               });
-              localStorage.setItem(${selectedFile}, res.data.message);
+              // localStorage.setItem(${selectedFile}, res.data.message);
             });
         }
       } catch (error) {}
@@ -212,7 +213,7 @@ function Page() {
           <div className="grid grid-cols-8">
             <div className="bg-[#264F9460] col-span-2 m-6 mr-0 mb-0 rounded-2xl flex justify-center">
                 <div className="text-white w-5/6 m-2 mr-2 h-[550px] rounded-2xl flex flex-col">
-                  <p className="text-xl p-2 font-mono"> <PiCode className="inline h-7 w-7" /> {repoName.toUpperCase()}</p>
+                  <p className="text-xl p-2 font-mono"> <PiCode className="inline h-7 w-7" /> {repoName && repoName.toUpperCase()}</p>
                   <hr className="mb-5" />
                   <div className="flex flex-col h-[550px] text-[#b5daff] gap-1 overflow-y-auto custom-scrollbar">
                     {data &&
@@ -221,12 +222,15 @@ function Page() {
                           <button
                             onClick={(e) => {
                               e.preventDefault();
-                              setSelectedFile(key);
+                              const a = key.split('.')[key.split('.').length - 1];
+                              if( !InvalidFiles.includes(a.toLowerCase()) && !InvalidFiles.includes(a.toUpperCase())){
+                                setSelectedFile(key);
+                              }
                             }}
                             key={key}
                           >
                             {" "}
-                            <p className="bg-[#40506a] text-left pl-3 py-1 rounded-md hover:border">{key}</p>{" "}
+                            <p className={` ${key == selectedFile ? " bg-blue-500 " : " bg-[#40506a] "} text-left pl-3 py-1 rounded-md hover:border`}>{key}</p>{" "}
                           </button>
                         );
                       })}
