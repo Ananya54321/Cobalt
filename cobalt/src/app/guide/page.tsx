@@ -1,24 +1,34 @@
-"use client"
-import axios from 'axios';
-import React, { useEffect, useRef, useState } from 'react'
-import fetchDirectoryContents from '@/helpers/github/gitApi'
-import Link from 'next/link';
-import SnippetComponent from './SnippetComponent';
-import toast from 'react-hot-toast';
+"use client";
+import axios from "axios";
+import React, { useEffect, useRef, useState } from "react";
+import fetchDirectoryContents from "@/helpers/github/gitApi";
+import Link from "next/link";
+import SnippetComponent from "./SnippetComponent";
+import toast from "react-hot-toast";
+import NavBar from "@/components/NavBar";
+import Image from "next/image";
+import search from "@/Images/whitesearch.svg";
+import { PiCode } from "react-icons/pi";
+import { Button } from "@/components/ui/button";
+import HashLoader from "react-spinners/HashLoader";
+import { IoMdClose } from "react-icons/io";
+import RingLoader from "react-spinners/RingLoader";
+
 
 function Page() {
-  const [repoLink,setRepoLink] = useState<string>("");
-  const [data,setData]= useState<object>();
-  const [explanations,setExplanations]= useState<object>()
-  const [repoName,setRepoName]= useState<string>("")
-  const [userName,setUserName]= useState<string>("")
-  const [selectedFile,setSelectedFile]= useState<string>()
-  const [selectedText, setSelectedText] = useState('');
+  const [repoLink, setRepoLink] = useState<string>("");
+  const [data, setData] = useState<object>();
+  const [explanations, setExplanations] = useState<object>();
+  const [repoName, setRepoName] = useState<string>("");
+  const [userName, setUserName] = useState<string>("");
+  const [selectedFile, setSelectedFile] = useState<string>();
+  const [selectedText, setSelectedText] = useState("");
   const [buttonPosition, setButtonPosition] = useState({ x: 0, y: 0 });
-  const [snippetBox, setSnippetBox] = useState(false)
-  const [repLoading,setRepoLoading] = useState(false)
-  const [expLoading,setExpLoading] = useState(false);
-  const [recentRepos,setRecentRepos] = useState<Array<String>>();
+  const [snippetBox, setSnippetBox] = useState(false);
+  const [repLoading, setRepoLoading] = useState(false);
+  const [codeLoading, setCodeLoading] = useState(false);
+  const [expLoading, setExpLoading] = useState(false);
+  const [recentRepos, setRecentRepos] = useState<Array<String>>();
 
   const handleSelection = () => {
     const selection = window.getSelection();
@@ -27,191 +37,296 @@ function Page() {
       setSelectedText(selectedText);
       const range = selection.getRangeAt(0).getBoundingClientRect();
       const { top, left } = range;
-      setButtonPosition({ x: left, y: top });
+      setButtonPosition({ x: left + 40, y: top });
     }
   };
 
-  useEffect(()=>{
-    if(repoLink.startsWith("https://")){
-      setRepoLink(repoLink.replace("https://",""))
+  useEffect(() => {
+    if (repoLink.startsWith("https://")) {
+      setRepoLink(repoLink.replace("https://", ""));
     }
-    setUserName(repoLink.split('/')[1])
-    setRepoName(repoLink.split('/')[2])
-  },[repoLink])
+    setUserName(repoLink.split("/")[1]);
+    setRepoName(repoLink.split("/")[2]);
+  }, [repoLink]);
 
-
-
-  const GetRepo =async()=>{
-    
+  const GetRepo = async () => {
     // if(userName==null || repoName==null ){
     //   return
     // }
-    if(repoLink==null || repoLink == ""){
-      return
+    if (repoLink == null || repoLink == "") {
+      return;
     }
-    
-    setRepoLoading(true)
-    // setRecentRepos([...recentRepos,`${userName}/${repoName}`])
-    const d = localStorage.getItem(`${userName}/${repoName}`)
-    if(d==null){
+
+    setRepoLoading(true);
+    // setRecentRepos([...recentRepos,${userName}/${repoName}])
+    const d = localStorage.getItem(${userName}/${repoName});
+    if (d == null) {
       try {
-        await fetchDirectoryContents(userName,repoName).then((data)=>{
-          if(data==null){
-            console.log("Cannot fetch")
-          }else{
-            setData(data)
-            localStorage.setItem(`${userName}/${repoName}`,JSON.stringify(data))
-            Object.keys(data).forEach((key)=>{
-              if(hasREADME(key)){
+        await fetchDirectoryContents(userName, repoName).then((data) => {
+          if (data == null) {
+            console.log("Cannot fetch");
+          } else {
+            setData(data);
+            localStorage.setItem(
+              ${userName}/${repoName},
+              JSON.stringify(data)
+            );
+            Object.keys(data).forEach((key) => {
+              if (hasREADME(key)) {
                 setSelectedFile(key);
               }
-            })
+            });
           }
-        })
-      } catch (error) {
-        
+        });
+      } catch (error) {}
+    } else {
+      setData(JSON.parse(d));
     }
-  }else{
-    setData(JSON.parse(d))
-  }
-    setRepoLoading(false)
-  }
+    setRepoLoading(false);
+  };
 
-  useEffect(()=>{
-    localStorage.setItem("recentRepos",JSON.stringify(recentRepos));
-  },[recentRepos])
+  useEffect(() => {
+    localStorage.setItem("recentRepos", JSON.stringify(recentRepos));
+  }, [recentRepos]);
 
-  const LoadExp = async()=>{
-    setExpLoading(true)
-    // const cache = localStorage.getItem(`${selectedFile}`)
-    const cache = null
-    if(selectedFile==null){
-      return
+  const LoadExp = async () => {
+    setExpLoading(true);
+    // const cache = localStorage.getItem(${selectedFile})
+    const cache = null;
+    if (selectedFile == null) {
+      return;
     }
-    if(cache == null){
+    if (cache == null) {
       try {
-        if(hasREADME(selectedFile)){
-          await axios.post('api/users/askgeminitext',{prompt:readMePrompt()}).then((res)=>{
-           
-            setExplanations({...explanations,selectedFile:res.data.message})
-            localStorage.setItem(`${selectedFile}`,res.data.message)
-          })
-        }else{
-          await axios.post('api/users/askgeminitext',{prompt:FilePrompt()}).then((res)=>{
-            setExplanations({...explanations,selectedFile:res.data.message})
-            localStorage.setItem(`${selectedFile}`,res.data.message)
-          })
+        if (hasREADME(selectedFile)) {
+          await axios
+            .post("api/users/askgeminitext", { prompt: readMePrompt() })
+            .then((res) => {
+              setExplanations({
+                ...explanations,
+                selectedFile: res.data.message,
+              });
+              localStorage.setItem(${selectedFile}, res.data.message);
+            });
+        } else {
+          await axios
+            .post("api/users/askgeminitext", { prompt: FilePrompt() })
+            .then((res) => {
+              setExplanations({
+                ...explanations,
+                selectedFile: res.data.message,
+              });
+              localStorage.setItem(${selectedFile}, res.data.message);
+            });
         }
-      } catch (error) {
-        
-      }
-    }else{
-      setExplanations({...explanations,selectedFile:cache})
+      } catch (error) {}
+    } else {
+      setExplanations({ ...explanations, selectedFile: cache });
     }
-    setExpLoading(false)
-  }
+    setExpLoading(false);
+  };
 
-  useEffect(()=>{
-    if(selectedFile !=null){
-      setExplanations(null);  
-      LoadExp()
+  useEffect(() => {
+    if (selectedFile != null) {
+      setExplanations(null);
+      LoadExp();
     }
-  },[selectedFile])
-
+  }, [selectedFile]);
 
   function readMePrompt() {
-    const a = "Analyze the given README.md file and provide a comprehensive explanation of the project it describes. Include details about the project's purpose, functionalities, installation instructions, usage steps, and any relevant contributing guidelines. Additionally, identify any links or references mentioned in the Readme that could be helpful for further exploration. give in plain text ,remove all highlighting" + data[selectedFile]
-    return a
+    const a =
+      "Analyze the given README.md file and provide a comprehensive explanation of the project it describes. Include details about the project's purpose, functionalities, installation instructions, usage steps, and any relevant contributing guidelines. Additionally, identify any links or references mentioned in the Readme that could be helpful for further exploration. give in plain text ,remove all highlighting" +
+      data[selectedFile];
+    return a;
   }
 
-  
   function FilePrompt() {
-    const a = " Analyze the code in <selected file> and provide detailed explanations for each function defined within the file. Explain the purpose of each function, its parameters, return values (if any), and the logic it implements. Additionally, identify any internal function calls or dependencies between functions.. give in plain text ,remove all highlighting" + data[selectedFile]
-    return a
+    const a =
+      " Analyze the code in <selected file> and provide detailed explanations for each function defined within the file. Explain the purpose of each function, its parameters, return values (if any), and the logic it implements. Additionally, identify any internal function calls or dependencies between functions.. give in plain text ,remove all highlighting" +
+      data[selectedFile];
+    return a;
   }
 
   function hasREADME(string: string) {
     const regex = /README\.md/i;
     return regex.test(string);
   }
-  
 
-
-
-  useEffect(()=>{
+  useEffect(() => {
     // setRecentRepos(localStorage.getItem('recentRepos')|| null)
     // localStorage.clear();
-  },[])
+  }, []);
 
   return (
-    <>
-    <input type="text" value={repoLink} onChange={(e)=>{setRepoLink(e.target.value)}} name="" id="" />
-    {/* <input  value={userName} onChange={(e)=>{setUserName(e.target.value)}} type="text" name="" id="" /> */}
-    {/* <input value={repoName} onChange={(e)=>{setRepoName(e.target.value)}} type="text" name="" id="" /> */}
-    {repLoading ? <>
-  <button disabled onClick={(e)=>{e.preventDefault();setData(null);GetRepo()}}>getrepo</button>
-    </> :<>
-  <button onClick={(e)=>{e.preventDefault();setData(null);GetRepo()}}>getrepo</button>
-    </>}
+    <div className="spacebg">
+      <NavBar />
 
-{repLoading ? <>
+      <div className="flex justify-center gap-5">
+        <input
+          type="text"
+          value={repoLink}
+          onChange={(e) => {
+            setRepoLink(e.target.value);
+          }}
+          name=""
+          id=""
+          className=" px-4 py-2 mt-8 h-10 min-w-[400px] bg-[#1e293b] rounded-md text-[#8f9eb3] focus:outline-none focus:ring focus:ring-opacity-60"
+        />
+        {repLoading ? (
+          <>
+            <Button
+              disabled
+            variant="anibutton"
+            className="h-10 mt-8 min-w-[100px] text-md font-semibold"
 
-repo loading......
+              onClick={(e) => {
+                e.preventDefault();
+                setData(null);
+                GetRepo();
+              }}
+            >
+              <span className="relative z-10">Loading...</span>
+              
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button
+            variant="anibutton"
+              className="h-10 mt-8 min-w-[100px] text-md font-semibold"
+              onClick={(e) => {
+                e.preventDefault();
+                setData(null);
+                GetRepo();
+              }}
+            >
+              <span className="relative z-10">Get Repo</span>
+              
+            </Button>
+          </>
+        )}
+      </div>
 
-</> : <>
+      {data != null ? (
+        <div className="">
+          <div className="grid grid-cols-8">
+            <div className="bg-[#264F9460] col-span-2 m-6 mr-0 mb-0 rounded-2xl flex justify-center">
+                <div className="text-white w-5/6 m-2 mr-2 h-[550px] rounded-2xl flex flex-col">
+                  <p className="text-xl p-2 font-mono"> <PiCode className="inline h-7 w-7" /> {repoName.toUpperCase()}</p>
+                  <hr className="mb-5" />
+                  <div className="flex flex-col h-[550px] text-[#b5daff] gap-1 overflow-y-auto custom-scrollbar">
+                    {data &&
+                      Object.keys(data).map((key) => {
+                        return (
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setSelectedFile(key);
+                            }}
+                            key={key}
+                          >
+                            {" "}
+                            <p className="bg-[#40506a] text-left pl-3 py-1 rounded-md hover:border">{key}</p>{" "}
+                          </button>
+                        );
+                      })}
+                  </div>
+                </div>
+            </div>
+            <div className="bg-[#264F9460] col-span-3 m-6 mr-0 rounded-2xl text-white h-[550px] p-4 overflow-y-auto custom-scrollbar hover:border ">
+              {data &&
+                Object.keys(data).map((key) => {
+                  if (key == selectedFile)
+                    return (
+                      <pre
+                        className="whitespace-pre-wrap font-sans"
+                        onMouseUp={handleSelection}
+                        onMouseDown={() => {
+                          setSelectedText(null);
+                        }}
+                        key={key}
+                      >
+                        {" "}
+                        {data[key]}{" "}
+                      </pre>
+                    );
+                })}
+              <div>
+              
+                {selectedText && (
+                  <div
+                    className=""
+                    style={{
+                      position: "absolute",
+                      top: buttonPosition.y,
+                      left: buttonPosition.x,
+                    }}
+                  >
+                    <Button className=" w-20 p-1"
+                    variant = "snipbutton"
+                      onClick={() => {
+                        setSnippetBox(true);
+                      }}
+                    >
+                      Snip
+                    </Button>
+                    {/* opens snippet box */}
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="bg-[#264F9460] col-span-3 m-6 rounded-2xl text-white h-[550px] overflow-y-auto custom-scrollbar hover:border">
+              {snippetBox ? (
+                <>
+                  <Button
+                  variant="snipbutton"
+                  className="w-10 p-1 rounded-full m-3 mb-0 fixed"
+                    onClick={() => {
+                      setSnippetBox(false);
+                    }}
+                  >
+                    {" "}
+                    <IoMdClose className="h-5 w-5 inline" />{" "}
+                  </Button>
+                  <SnippetComponent code={selectedText} />
+                </>
+              ) : (
+                <>
+                  {expLoading ? (
+                    // <div ><HashLoader color="#2196f3" size={100} /></div>
+                    <div className="flex items-center justify-center h-[550px]"><RingLoader color="#2196f3" size={100} /></div>
 
-<div className='flex flex-row'>
-    <div>
-    {data && Object.keys(data).map((key)=>{
-      if(expLoading){
-        return <button disabled onClick={(e)=>{e.preventDefault();setSelectedFile(key)}} key={key} > <p>{key}</p> </button>
-      }else{
-        return <button onClick={(e)=>{e.preventDefault();setSelectedFile(key)}} key={key} > <p>{key}</p> </button>
-      }
-    })}
-    </div>
-
-
-    <div>
-      {data && Object.keys(data).map((key)=>{
-          if(key == selectedFile)
-          return <pre onMouseUp={handleSelection} onMouseDown={()=>{setSelectedText(null)}} key={key}> {data[key]} </pre>
-      })}
-      {selectedText && (
-        <div className='bg-slate-700' style={{ position: 'absolute', top: buttonPosition.y, left: buttonPosition.x }}>
-          <button onClick={()=>{setSnippetBox(true)}}>Action</button>
+                  ) : (
+                    <>
+                      {explanations &&
+                        Object.keys(explanations).map((key) => {
+                          return (
+                            <div className="p-4">
+                              <pre className="whitespace-pre-wrap font-sans" key={key}>
+                              {explanations[key]}{" "}
+                            </pre>
+                            </div>
+                            
+                          );
+                        })}
+                    </>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="flex justify-center items-center">
+          <Image
+            src={search}
+            alt={"search"}
+            className="h-[800px] w-[800px]"
+          ></Image>
         </div>
       )}
     </div>
-
-    <div>
-      {snippetBox ? <>
-      <button onClick={()=>{setSnippetBox(false)}}> close </button>
-      <SnippetComponent code={selectedText}  /> 
-      </> : 
-      <>
-      {
-        expLoading ? <>
-        
-        Exp Loading.......
-        </> : <>
-        
-        {explanations && Object.keys(explanations).map((key)=>{
-        return <pre  key={key}>{explanations[key]} </pre>
-      })}
-      </>}
-        </>
-      }
-      
-    </div>
-</div>
-
-</>}
-
-
-    </>
-  )
+  );
 }
 
-export default Page
-
+export default Page;

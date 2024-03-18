@@ -14,12 +14,6 @@ export function middleware(request: NextRequest) {
     if(path ==='/resetpassword'){
       return
     }
-    if(path ==='/test'){
-      return
-    }
-    if(path ==='/prompt'){
-      return
-    }
     if(path ==='/guide'){
       return
     }
@@ -37,16 +31,9 @@ export const config = {
     '/login',
     '/signup',
     '/verifyemail',
-    '/room',
-    '/room/:path*',
-    '/test',
     '/forgotpassword',
     '/resetpassword',
-    '/test',
     '/otherlogins',
-    '/prompt',
-
-    '/snippet',
     '/guide',
     '/mysnippets'
   ]

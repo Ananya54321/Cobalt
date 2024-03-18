@@ -24,7 +24,7 @@ export default function RootLayout({
 
 
   return (
-    <html lang="en" className=''>
+    <html lang="en" className='spacebg'>
       <body className={inter.className}>
         <CheckExistence/>
       <div className="overlay"></div>
