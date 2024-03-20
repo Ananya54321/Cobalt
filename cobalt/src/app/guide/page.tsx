@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import HashLoader from "react-spinners/HashLoader";
 import { IoMdClose } from "react-icons/io";
 import RingLoader from "react-spinners/RingLoader";
+import jsPDF from 'jspdf';
 
 const InvalidFiles = ['mp3','mp4','gif','jpeg','jpg','png','svg','webp','class','exe']
 
@@ -134,6 +135,27 @@ function Page() {
     }
   }, [selectedFile]);
 
+
+  const AskFurtherExp = async()=>{
+    setSnippetBox(false)
+    setExpLoading(true);
+    try {
+      await axios
+            .post("api/users/askgeminitext", { prompt:SnippetPrompt() })
+            .then((res) => {
+              setExplanations({
+                ...explanations,
+                selectedFile: res.data.message,
+              });
+            });     
+    } catch (error) {
+      
+    }
+    setExpLoading(false)
+  }
+
+
+
   function readMePrompt() {
     const a =
       "Analyze the given README.md file and provide a comprehensive explanation of the project it describes. Include details about the project's purpose, functionalities, installation instructions, usage steps, and any relevant contributing guidelines. Additionally, identify any links or references mentioned in the Readme that could be helpful for further exploration. give in plain text ,remove all highlighting" +
@@ -148,6 +170,13 @@ function Page() {
     return a;
   }
 
+  function SnippetPrompt() {
+    const a =
+      " Considering the provided code snippet, explain its functionality in detail. Break down the code line by line, explaining the purpose of each line and how they work together to achieve the desired outcome. Additionally, identify any variables, data structures, or control flow statements used in the code and explain their significance.      " +
+      selectedText;
+    return a;
+  }
+
   function hasREADME(string: string) {
     const regex = /README\.md/i;
     return regex.test(string);
@@ -157,6 +186,52 @@ function Page() {
     // setRecentRepos(localStorage.getItem('recentRepos')|| null)
     // localStorage.clear();
   }, []);
+
+
+  const downloadPDF = (content) => {
+    const doc = new jsPDF();
+  
+    const margin = 10;
+    const pageHeight = doc.internal.pageSize.height - 2 * margin;
+  
+    const lines = doc.splitTextToSize(content, doc.internal.pageSize.width - 2 * margin);
+  
+    let y = margin;
+    let currentPage = 1;
+    lines.forEach((line, index) => {
+      if (y > pageHeight) {
+        doc.addPage();
+        currentPage++;
+        y = margin;
+      }
+      doc.text(margin, y, line);
+      y += doc.getTextDimensions(line).h + 5; // Line height + padding
+    });
+  
+    // Generate the PDF
+    const pdfContent = doc.output();
+  
+    // Create a blob from the PDF content
+    const blob = new Blob([pdfContent], { type: "application/pdf" });
+  
+    // Create a temporary anchor element
+    const link = document.createElement("a");
+    link.href = window.URL.createObjectURL(blob);
+  
+    // Set the file name
+    link.download = "content.pdf";
+  
+    // Trigger the download
+    link.click();
+  
+    // Clean up
+    setTimeout(() => {
+      // For Firefox it is necessary to delay revoking the ObjectURL
+      window.URL.revokeObjectURL(link.href);
+      link.remove();
+    }, 100);
+  };
+
 
   return (
     <div className="spacebg">
@@ -274,6 +349,16 @@ function Page() {
                     >
                       Snip
                     </Button>
+                    <Button className=" w-20 p-1"
+                    variant = "snipbutton"
+                      onClick={() => {
+                        AskFurtherExp()
+                      }}
+                    >
+                      Ask GPT
+                    </Button>
+
+
                     {/* opens snippet box */}
                   </div>
                 )}
@@ -302,17 +387,30 @@ function Page() {
 
                   ) : (
                     <>
-                      {explanations &&
-                        Object.keys(explanations).map((key) => {
-                          return (
-                            <div className="p-4">
-                              <pre className="whitespace-pre-wrap font-sans" key={key}>
-                              {explanations[key]}{" "}
-                            </pre>
-                            </div>
-                            
-                          );
-                        })}
+                      {explanations && 
+                      
+                    Object.keys(explanations).map((key) => {
+                      return ( 
+                      <>
+                        <Button className=" w-20 p-1"
+                      variant = "snipbutton"
+                        onClick={() => {
+                         
+                          downloadPDF( data[selectedFile] + explanations[key])
+                        }}
+                      >
+                        Download
+                      </Button>
+                        <div key={key} className="p-4">
+                          <pre className="whitespace-pre-wrap font-sans" key={key}>
+                          {explanations[key]}{" "}
+                        </pre>
+                        </div>
+                      </>
+                      );
+                    })
+                     
+                        }
                     </>
                   )}
                 </>
