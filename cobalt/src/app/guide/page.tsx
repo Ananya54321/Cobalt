@@ -237,7 +237,7 @@ function Page() {
                   </div>
                 </div>
             </div>
-            <div className="bg-[#264F9460] col-span-3 m-6 mr-0 rounded-2xl text-white h-[550px] p-4 overflow-y-auto custom-scrollbar hover:border ">
+            <div className="bg-[#264F9460] col-span-3 m-6 mr-0 rounded-2xl text-white h-[550px] p-4 overflow-y-auto custom-scrollbar hover:border">
               {data &&
                 Object.keys(data).map((key) => {
                   if (key == selectedFile)
