@@ -15,7 +15,8 @@ export default function Home() {
       <NavBar />
       {/* Hero Section */}
       {
-        <section
+        <div className="fade-in">
+           <section
           className="hero-section relative flex items-center justify-center h-screen bg-cover bg-center border-b-8 border-gray-900 mb-8"
           
         >
@@ -32,6 +33,8 @@ export default function Home() {
             </button>
           </div>
         </section>
+        </div>
+       
       }
 
       {/* About Section */}
