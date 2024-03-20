@@ -15,7 +15,8 @@ export default function Home() {
       <NavBar />
       {/* Hero Section */}
       {
-        <section
+        <div className="fade-in">
+           <section
           className="hero-section relative flex items-center justify-center h-screen bg-cover bg-center border-b-8 border-gray-900 mb-8"
           style={{
             backgroundImage: `url("https://images.unsplash.com/photo-1444703686981-a3abbc4d4fe3?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")`,
@@ -35,6 +36,8 @@ export default function Home() {
             </button>
           </div>
         </section>
+        </div>
+       
       }
 
       {/* About Section */}
