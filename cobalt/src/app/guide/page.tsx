@@ -15,6 +15,7 @@ import { IoMdClose } from "react-icons/io";
 import RingLoader from "react-spinners/RingLoader";
 import jsPDF from 'jspdf';
 
+
 const InvalidFiles = ['mp3','mp4','gif','jpeg','jpg','png','svg','webp','class','exe']
 
 function Page() {
@@ -311,6 +312,10 @@ function Page() {
                       })}
                   </div>
                 </div>
+                <div>
+     
+    </div>
+                
             </div>
             <div className="bg-[#264F9460] col-span-3 m-6 mr-0 rounded-2xl text-white h-[550px] p-4 overflow-y-auto custom-scrollbar hover:border">
               {data &&
@@ -377,7 +382,7 @@ function Page() {
                     {" "}
                     <IoMdClose className="h-5 w-5 inline" />{" "}
                   </Button>
-                  <SnippetComponent code={selectedText} />
+                  <SnippetComponent code={selectedText} getHubLink={repoLink}/>
                 </>
               ) : (
                 <>
