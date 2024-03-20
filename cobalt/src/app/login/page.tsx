@@ -49,7 +49,7 @@ export default function LoginPage() {
   return (
     <>
       <div
-        className="min-h-screen flex justify-center spacebg items-center bg-gray-900"
+        className="min-h-screen flex justify-center spacebg items-center bg-gray-900 "
         
       >
         <div className="w-full max-w-md bg-gray-800 p-8 rounded-3xl shadow-lg animate-fadeIn">

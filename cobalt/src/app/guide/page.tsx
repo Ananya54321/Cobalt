@@ -17,7 +17,7 @@ import jsPDF from 'jspdf';
 
 const InvalidFiles = ['mp3','mp4','gif','jpeg','jpg','png','svg','webp','class','exe']
 
-const InvalidFiles = ['mp3','mp4','gif','jpeg','jpg','png','svg','webp','class','exe']
+
 
 function Page() {
   const [repoLink, setRepoLink] = useState<string>("");

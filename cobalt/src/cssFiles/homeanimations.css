@@ -69,7 +69,7 @@
   font-size: 3rem;
   color:white;
   animation: 
-    typing 1.5s steps(20, end) forwards,
+    typing 2.2s steps(20, end) forwards,
     blinking 5s 1.5s forwards;
   width: 0;
 }
@@ -81,3 +81,22 @@ to { width: 100%; }
   from { border-color: transparent }
   to { border-color: transparent; }
 }
+@keyframes slideIn {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 1.5s ease-out;
+}
+.animate-slide-in1{
+  animation:slideIn 3s ease-out;
+}
+
+
