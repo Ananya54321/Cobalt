@@ -75,12 +75,23 @@
   }
 } */
 .spacebg{
-  /* background-image: url(../Images/nice.jpg); */
-  background-color: #0F1927;
+  background-image: url(../Images/nice.jpg);
+  /* background-color: #0F1927; */
   background-repeat: no-repeat;
     background-size: cover; 
     background-position: center;
 }
+
+.homebg {
+  background-image: url(../Images/home.png);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  border-radius: 10px; /* Adjust the radius value as needed */
+  overflow: hidden; /* Ensures the border radius is applied to the image */ /* Adjust the blur intensity as needed */
+}
+
+
 /* 
 src in snippet
 */
