@@ -89,7 +89,7 @@ export default function SnippetComponent({ code,getHubLink }) {
       <h1 className="text-xl mt-10 font-mono text-center">Save Code Snippet</h1>
       <form onSubmit={handleSubmit}>
         <div>
-          <h1>RepoLink</h1>
+          <h1>RepoLink : {getHubLink}</h1>
           <label htmlFor="title" className="mr-4">
             Title:{" "}
           </label>

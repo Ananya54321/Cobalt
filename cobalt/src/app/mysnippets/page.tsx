@@ -3,6 +3,9 @@ import NavBar from "@/components/NavBar";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import GitHubIcon from '@mui/icons-material/GitHub';
+import Link from "next/link";
+
 
 function Page() {
   const [snippets, setSnippets] = useState<Array<object>>();
@@ -140,6 +143,7 @@ function Page() {
                                   );
                                 })}
                             </ol>
+                            <a href={`https://${snippet.src}`} target="_blank" > <GitHubIcon/> </a>
                           </div>
                           <p className="text-[#b5daff]">Code: </p>
                           <div className="bg-[#1e293b] rounded-md text-[#c4cede] max-w-xl border border-slate-300 mb-7 overflow-y-auto">

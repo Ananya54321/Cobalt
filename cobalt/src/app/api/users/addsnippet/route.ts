@@ -11,7 +11,7 @@ connect()
 export async function POST(request:NextRequest){
     try {
         const reqBody = await request.json()
-        const {code,description,title,tags} = reqBody
+        const {code,description,title,tags,src} = reqBody
         const userId = getDataFromToken(request)
         if(userId == null){
             console.log(true)
@@ -22,7 +22,7 @@ export async function POST(request:NextRequest){
             return response
         }
         await Snippet.create({
-            userId:userId,code:code,description:description,title:title,tags:tags
+            userId:userId,code:code,description:description,title:title,tags:tags,src:src
         })
 
         return NextResponse.json({message:'snippet created',success:true})
