@@ -59,6 +59,15 @@ export default function SnippetComponent({ code }) {
           router.push("/login");
           return;
         }
+        setSnippetData(
+          {
+            title: "",
+            description: "",
+            code: "",
+            tags: [],
+          }
+        )
+        toast.success("Successfully Saved!");
       });
       console.log("Sending data to MongoDB:", snippetData);
     } catch (error) {
