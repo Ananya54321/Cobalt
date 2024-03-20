@@ -274,7 +274,7 @@ function Page() {
           }
           if (type == "EXPLAINCODE") {
             Object.keys(data).forEach((key) => {
-              key == selectedFile;
+              if(key == selectedFile)
               setExplainations({ ...explainations, [key]: res.data.message });
             });
             setExpLoading(false);
@@ -282,7 +282,7 @@ function Page() {
 
           if (type == "OPTIMIZECODE") {
             Object.keys(data).forEach((key) => {
-              key == selectedFile;
+              if(key == selectedFile)
               setOptimizations({ ...optimizations, [key]: res.data.message });
             });
             setOptLoading(false);
