@@ -5,12 +5,12 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-export default function SnippetComponent({ code }) {
+export default function SnippetComponent({ code,getHubLink }) {
   const router = useRouter();
 
   useEffect(() => {
     if (code) {
-      setSnippetData({ ...snippetData, code: code });
+      setSnippetData({ ...snippetData, code: code,src:getHubLink });
     }
   }, []);
 
@@ -19,7 +19,15 @@ export default function SnippetComponent({ code }) {
     description: "",
     code: "",
     tags: [],
+    src:getHubLink
   });
+
+  // useEffect(()=>{
+  //   console.log(getHubLink)
+  //   if(getHubLink){
+  //     setSnippetData({...snippetData, src: getHubLink})
+  //   }
+  // },[getHubLink])
   const [tagInput, setTagInput] = useState("");
 
   const handleTagInputChange = (e) => {
@@ -60,6 +68,7 @@ export default function SnippetComponent({ code }) {
           return;
         }
       });
+      
       console.log("Sending data to MongoDB:", snippetData);
     } catch (error) {
       console.error("Error storing data in MongoDB:", error);
@@ -71,6 +80,7 @@ export default function SnippetComponent({ code }) {
       <h1 className="text-xl mt-10 font-mono text-center">Save Code Snippet</h1>
       <form onSubmit={handleSubmit}>
         <div>
+          <h1>RepoLink</h1>
           <label htmlFor="title" className="mr-4">
             Title:{" "}
           </label>

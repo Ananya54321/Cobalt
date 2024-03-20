@@ -85,6 +85,7 @@ function Page() {
                     return <li key={tag} >{tag}</li>
                 })}</ol>
                 <pre> {snippet.code}  </pre>
+                
             </div>
             }else{
                 return <div className=' border' onClick={()=>{setSelectedSnippet(snippet)}}   key={snippet._id} >
@@ -93,6 +94,7 @@ function Page() {
                 <ol>{snippet.tags && snippet.tags.map((tag)=>{
                     return <li key={tag} >{tag}</li>
                 })}</ol>
+                <h1>{snippet.src}</h1>
             </div>
             }
             
