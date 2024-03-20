@@ -14,7 +14,11 @@ import React, { useEffect, useState } from "react";
 import CodeEditor from "@uiw/react-textarea-code-editor";
 import jsPDF from "jspdf";
 import SnippetComponent from "./SnippetComponent";
+import { FaFileDownload } from "react-icons/fa";
+
 import { useRef } from "react";
+import RingLoader from "react-spinners/RingLoader";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const SIDEBOXTYPES = ["EXPLAIN", "MODEL", "SAVE", "OPTIMIZE"];
 const InvalidFiles = [
@@ -251,7 +255,9 @@ function Page() {
 
     if (type == "OPTIMIZECODE") {
       setOptLoading(true);
-      Prompt = "Optimize the code" + data[selectedFile];
+      Prompt =
+        "Optimize the code in the provided file to enhance its efficiency and performance. Identify areas where the code can be improved, such as through algorithmic enhancements, streamlined logic, or resource management. Focus on reducing redundant operations, minimizing memory usage, and improving overall runtime. Your goal is to generate a revised version of the code that maintains its functionality while achieving higher levels of optimization. Ensure that the optimized code maintains readability and clarity, facilitating easy comprehension and future maintenance." +
+        data[selectedFile];
     }
 
     if (type == "OPTIMIZEREADME") {
@@ -264,7 +270,9 @@ function Page() {
     }
     if (type == "DETECTCODE") {
       setDetLoading(true);
-      Prompt = "" + data[selectedFile];
+      Prompt =
+        "From the given code, detect and list out the functions used in the code seperately in a neat format and give one line comment before each function explaining the purpose of the function" +
+        data[selectedFile];
     }
 
     try {
@@ -281,8 +289,8 @@ function Page() {
           }
           if (type == "EXPLAINCODE") {
             Object.keys(data).forEach((key) => {
-              if(key == selectedFile){
-              setExplainations({ ...explainations, [key]: res.data.message });
+              if (key == selectedFile) {
+                setExplainations({ ...explainations, [key]: res.data.message });
               }
             });
             setExpLoading(false);
@@ -290,8 +298,8 @@ function Page() {
 
           if (type == "OPTIMIZECODE") {
             Object.keys(data).forEach((key) => {
-              if(key == selectedFile){
-              setOptimizations({ ...optimizations, [key]: res.data.message });
+              if (key == selectedFile) {
+                setOptimizations({ ...optimizations, [key]: res.data.message });
               }
             });
             setOptLoading(false);
@@ -327,7 +335,7 @@ function Page() {
   return (
     <>
       <div className="h-screen flex flex-col">
-       <NavBar />
+        <NavBar />
         <div className="p-4 flex gap-2">
           <input
             type="text"
@@ -370,223 +378,304 @@ function Page() {
             </>
           )}
         </div>
+
         {/* check */}
         <ResizablePanelGroup className="h-full flex" direction={"horizontal"}>
-          <ResizablePanel defaultSize={15} maxSize={15} className="bg-[#264F9460]  h-full border">
-            <div className=" flex flex-col text-[#b5daff] m-2 gap-2 overflow-y-scroll"
-            style={{overflow: 'scroll'}}
-            >
-
-            {data &&
-              Object.keys(data).map((key) => {
-                return (
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const a = key.split(".")[key.split(".").length - 1];
-                      if (
-                        !InvalidFiles.includes(a.toLowerCase()) &&
-                        !InvalidFiles.includes(a.toUpperCase())
-                      ) {
-                        setSelectedFile(key);
-                      }
-                    }}
-                    key={key}
-                  >
-                    {" "}
-                    <p
-                      className={` ${
-                        key == selectedFile ? " bg-blue-500 " : " bg-[#40506a] "
-                      } text-left pl-3 py-1 rounded-md hover:border`}
-                    >
-                      {key}
-                    </p>{" "}
-                  </button>
-                );
-              })}
-              </div>
-          </ResizablePanel>
-          <ResizableHandle />
-          <ResizablePanel minSize={30}>
-          <div className="bg-[#264F9460] h-full border text-white ">
-          {data &&
+          <ResizablePanel
+            defaultSize={15}
+            maxSize={15}
+            className="bg-[#264F9460]  h-full border"
+          >
+            <ScrollArea className=" flex flex-col text-[#b5daff] m-2 gap-2 overflow-y-scroll">
+              {data &&
                 Object.keys(data).map((key) => {
-                  if (key == selectedFile)
-                    return (
-                      <CodeEditor
-                        autoFocus
-                        ref={textref}
-                        autoComplete="off"
-                        value={data[selectedFile]}
-                        language={selectedFile.split(".")[1]}
-                        
-                        className="w-[100%] h-[100%] border backdrop-blur-xl overflow-y-scroll border-black rounded-md"
-                        spellCheck={false}
-                        onMouseUp={handleSelection}
-                        onMouseDown={() => {
-                          setSelectedText(null);
-                        }}
-                        key={key}
-                        style={{overflow: 'scroll'}}
+                  return (
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        const a = key.split(".")[key.split(".").length - 1];
+                        if (
+                          !InvalidFiles.includes(a.toLowerCase()) &&
+                          !InvalidFiles.includes(a.toUpperCase())
+                        ) {
+                          setSelectedFile(key);
+                        }
+                      }}
+                      key={key}
+                    >
+                      {" "}
+                      <p
+                        className={` ${
+                          key == selectedFile
+                            ? " bg-blue-500 "
+                            : " bg-[#40506a] "
+                        } text-left pl-3 py-1 rounded-md hover:border`}
                       >
-                        {" "}
-                        {data[key]}{" "}
-                      </CodeEditor>
-                    );
+                        {key}
+                      </p>{" "}
+                    </button>
+                  );
                 })}
-              {selectedText && (
-                <div
-                  className=""
-                  style={{
-                    position: "absolute",
-                    top: buttonPosition.y,
-                    left: buttonPosition.x,
-                  }}
-                >
-                  <Button
-                    className=" w-20 p-1"
-                    variant="snipbutton"
-                    onClick={() => {
-                      setSideBox("SAVE");
-                    }}
-                  >
-                    Snip
-                  </Button>
-                  <Button
-                    className=" w-20 p-1"
-                    variant="snipbutton"
-                    onClick={() => {}}
-                  >
-                    Ask GPT
-                  </Button>
-                </div>
-              )}
-            </div>
+            </ScrollArea>
           </ResizablePanel>
           <ResizableHandle />
-          <ResizablePanel minSize={30}>
-          <div className="bg-[#264F9460] h-full text-white overflow-y-auto custom-scrollbar border">
-          <ul className="flex text-center gap-1 p-1">
-                <li
-                  onClick={() => {
-                    setSideBox("EXPLAIN");
-                  }}
-                  className="bg-slate-500 w-[25%] hover:bg-slate-800 rounded-md p-2"
-                >
-                  Explanation
-                </li>
-                <li
-                  onClick={() => {
-                    setSideBox("SAVE");
-                  }}
-                  className="bg-slate-500 rounded-md hover:bg-slate-800 w-[25%]  p-2"
-                >
-                  Snippet
-                </li>
-                <li
-                  onClick={() => {
-                    setSideBox("MODEL");
-                  }}
-                  className="bg-slate-500 rounded-md hover:bg-slate-800 w-[25%] p-2"
-                >
-                  components
-                </li>
-                <li
-                  onClick={() => {
-                    setSideBox("OPTIMIZE");
-                  }}
-                  className="bg-slate-500 rounded-md hover:bg-slate-800 w-[25%] p-2"
-                >
-                  optimization
-                </li>
-              </ul>
-            <hr />
-            <div>
-                {sideBox == "EXPLAIN" && (
-                  <>
-                    {expLoading ? (
-                      <>exp loading...</>
-                    ) : (
+          <ResizablePanel>
+          <ResizablePanelGroup direction={"vertical"}>
+            <ResizablePanel>
+            <ResizablePanelGroup direction={"horizontal"}>
+              <ResizablePanel minSize={30}>
+                <div className="bg-[#264F9460] h-full border text-white ">
+                  {data &&
+                    Object.keys(data).map((key) => {
+                      if (key == selectedFile)
+                        return (
+                          <CodeEditor
+                            autoFocus
+                            ref={textref}
+                            autoComplete="off"
+                            value={data[selectedFile]}
+                            language={selectedFile.split(".")[1]}
+                            className="w-[100%] h-[100%] border backdrop-blur-xl overflow-y-scroll border-black rounded-md"
+                            spellCheck={false}
+                            onMouseUp={handleSelection}
+                            onMouseDown={() => {
+                              setSelectedText(null);
+                            }}
+                            key={key}
+                            style={{ overflow: "scroll" }}
+                          >
+                            {" "}
+                            {data[key]}{" "}
+                          </CodeEditor>
+                        );
+                    })}
+                  {selectedText && (
+                    <div
+                      className=""
+                      style={{
+                        position: "absolute",
+                        top: buttonPosition.y,
+                        left: buttonPosition.x,
+                      }}
+                    >
+                      <Button
+                        className=" w-20 p-1"
+                        variant="snipbutton"
+                        onClick={() => {
+                          setSideBox("SAVE");
+                        }}
+                      >
+                        Snip
+                      </Button>
+                      <Button
+                        className=" w-20 p-1"
+                        variant="snipbutton"
+                        onClick={() => {}}
+                      >
+                        Ask GPT
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </ResizablePanel>
+              <ResizableHandle />
+              <ResizablePanel minSize={30}>
+                <div className="bg-[#264F9460] h-full text-white overflow-y-auto custom-scrollbar border">
+                  <ul className="flex text-center gap-1 p-1">
+                    <li
+                      onClick={() => {
+                        setSideBox("EXPLAIN");
+                      }}
+                      className="bg-blue-500 w-[25%] hover:bg-slate-500 rounded-md p-2"
+                      style={{
+                        backgroundColor:
+                          sideBox == "EXPLAIN"
+                            ? "rgb(59 130 246)"
+                            : "rgb(100 116 139)",
+                      }}
+                    >
+                      Explanation
+                    </li>
+                    <li
+                      onClick={() => {
+                        setSideBox("SAVE");
+                      }}
+                      className="bg-slate-500 rounded-md hover:bg-slate-800 w-[25%]  p-2"
+                      style={{
+                        backgroundColor:
+                          sideBox == "SAVE"
+                            ? "rgb(59 130 246)"
+                            : "rgb(100 116 139)",
+                      }}
+                    >
+                      Snippet
+                    </li>
+                    <li
+                      onClick={() => {
+                        setSideBox("MODEL");
+                      }}
+                      className="bg-slate-500 rounded-md hover:bg-slate-800 w-[25%] p-2"
+                      style={{
+                        backgroundColor:
+                          sideBox == "MODEL"
+                            ? "rgb(59 130 246)"
+                            : "rgb(100 116 139)",
+                      }}
+                    >
+                      components
+                    </li>
+                    <li
+                      onClick={() => {
+                        setSideBox("OPTIMIZE");
+                      }}
+                      className="bg-slate-500 rounded-md hover:bg-slate-800 w-[25%] p-2"
+                      style={{
+                        backgroundColor:
+                          sideBox == "OPTIMIZE"
+                            ? "rgb(59 130 246)"
+                            : "rgb(100 116 139)",
+                      }}
+                    >
+                      optimization
+                    </li>
+                  </ul>
+                  <hr />
+
+                  <div>
+                    {sideBox == "EXPLAIN" && (
                       <>
-                        {explainations &&
-                          Object.keys(explainations).map((key) => {
-                            if (key == selectedFile) {
-                              return (
-                                <div key={key} className="p-4">
-                                  <pre
-                                    className="whitespace-pre-wrap font-sans"
-                                    key={key}
-                                  >
-                                    {explainations[key]}{" "}
-                                  </pre>
-                                </div>
-                              );
-                            }
-                          })}
+                        {expLoading ? (
+                          <>
+                            <div className="flex h-[100%] justify-center items-center pt-[250px]">
+                              <RingLoader color="#3b81f6" size={100} />
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            {explainations &&
+                              Object.keys(explainations).map((key) => {
+                                if (key == selectedFile) {
+                                  return (
+                                    <div key={key} className="p-4">
+                                      <pre
+                                        className="whitespace-pre-wrap font-sans"
+                                        key={key}
+                                      >
+                                        {explainations[key]}{" "}
+                                      </pre>
+                                      <div className="w-12 h-12 rounded-full border border-white fixed bottom-7 right-7 flex justify-center items-center hover:bg-blue-500">
+                                        <button
+                                          className="text-white"
+                                          onClick={() =>
+                                            downloadPDF(optimizations[key])
+                                          }
+                                        >
+                                          <FaFileDownload className="w-7 h-7" />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  );
+                                }
+                              })}
+                          </>
+                        )}
                       </>
                     )}
-                  </>
-                )}
-                {sideBox == "MODEL" && (
-                  <>
-                    {detLoading ? (
-                      <>det loading...</>
-                    ) : (
+                    {sideBox == "MODEL" && (
                       <>
-                        {detections &&
-                          Object.keys(detections).map((key) => {
-                            if (key == selectedFile) {
-                              return (
-                                <div key={key} className="p-4">
-                                  <pre
-                                    className="whitespace-pre-wrap font-sans"
-                                    key={key}
-                                  >
-                                    {detections[key]}{" "}
-                                  </pre>
-                                </div>
-                              );
-                            }
-                          })}
+                        {detLoading ? (
+                          <>
+                            <div className="flex h-[100%] justify-center items-center pt-[250px]">
+                              <RingLoader color="#3b81f6" size={100} />
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            {detections &&
+                              Object.keys(detections).map((key) => {
+                                if (key == selectedFile) {
+                                  return (
+                                    <div key={key} className="p-4">
+                                      <pre
+                                        className="whitespace-pre-wrap font-sans"
+                                        key={key}
+                                      >
+                                        {detections[key]}{" "}
+                                      </pre>
+                                      <div className="w-12 h-12 rounded-full border border-white fixed bottom-7 right-7 flex justify-center items-center hover:bg-blue-500">
+                                        <button
+                                          className="text-white"
+                                          onClick={() =>
+                                            downloadPDF(optimizations[key])
+                                          }
+                                        >
+                                          <FaFileDownload className="w-7 h-7" />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  );
+                                }
+                              })}
+                          </>
+                        )}
                       </>
                     )}
-                  </>
-                )}
-                {sideBox == "SAVE" && (
-                  <>
-                    <SnippetComponent
-                      code={selectedText}
-                      getHubLink={repoLink}
-                    />
-                  </>
-                )}
-                {sideBox == "OPTIMIZE" && (
-                  <>
-                    {optLoading ? (
-                      <>opt loading...</>
-                    ) : (
+                    {sideBox == "SAVE" && (
                       <>
-                        {optimizations &&
-                          Object.keys(optimizations).map((key) => {
-                            if (key == selectedFile) {
-                              return (
-                                <div key={key} className="p-4">
-                                  <pre
-                                    className="whitespace-pre-wrap font-sans"
-                                    key={key}
-                                  >
-                                    {optimizations[key]}{" "}
-                                  </pre>
-                                </div>
-                              );
-                            }
-                          })}
+                        <SnippetComponent
+                          code={selectedText}
+                          getHubLink={repoLink}
+                        />
                       </>
                     )}
-                  </>
-                )}
-              </div>
-              </div>
+                    {sideBox == "OPTIMIZE" && (
+                      <>
+                        {optLoading ? (
+                          <div className="flex h-[100%] justify-center items-center pt-[250px]">
+                            <RingLoader color="#3b81f6" size={100} />
+                          </div>
+                        ) : (
+                          <>
+                            {optimizations &&
+                              Object.keys(optimizations).map((key) => {
+                                if (key == selectedFile) {
+                                  return (
+                                    <div key={key} className="p-4">
+                                      <pre
+                                        className="whitespace-pre-wrap font-sans"
+                                        key={key}
+                                      >
+                                        {optimizations[key]}{" "}
+                                      </pre>
+                                      <div className="w-12 h-12 rounded-full border border-white fixed bottom-7 right-7 flex justify-center items-center hover:bg-blue-500">
+                                        <button
+                                          className="text-white"
+                                          onClick={() =>
+                                            downloadPDF(optimizations[key])
+                                          }
+                                        >
+                                          <FaFileDownload className="w-7 h-7" />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  );
+                                }
+                              })}
+                          </>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              </ResizablePanel>
+            </ResizablePanelGroup>
+            </ResizablePanel>
+            
+            <ResizableHandle />
+            <ResizablePanel defaultSize={15} minSize={10} maxSize={40}>
+              <div className="bg-black border border-white h-full">hello</div>
+            </ResizablePanel>
+          </ResizablePanelGroup>
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
@@ -595,4 +684,3 @@ function Page() {
 }
 
 export default Page;
-
