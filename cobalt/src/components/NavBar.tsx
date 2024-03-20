@@ -1,5 +1,5 @@
-'use client'
-import GetUser from "@/helpers/GetUser"
+"use client";
+import GetUser from "@/helpers/GetUser";
 import { useEffect, useState } from "react";
 import LogoutButton from "@/components/logout/LogoutButton"
 

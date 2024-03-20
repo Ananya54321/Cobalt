@@ -60,3 +60,24 @@
   opacity: 0;
   animation-delay: 2.1s; /* 0.5s (base delay) + 1s (additional delay) */
 }
+
+.typed-out{
+  overflow: hidden;
+  border-right: .15em solid orange;
+  white-space: nowrap;
+  margin-top: 10%;
+  font-size: 3rem;
+  color:white;
+  animation: 
+    typing 1.5s steps(20, end) forwards,
+    blinking 5s 1.5s forwards;
+  width: 0;
+}
+@keyframes typing {
+from { width: 0 }
+to { width: 100%; }
+}
+@keyframes blinking {
+  from { border-color: transparent }
+  to { border-color: transparent; }
+}
