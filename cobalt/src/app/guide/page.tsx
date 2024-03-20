@@ -13,10 +13,20 @@ import { Button } from "@/components/ui/button";
 import HashLoader from "react-spinners/HashLoader";
 import { IoMdClose } from "react-icons/io";
 import RingLoader from "react-spinners/RingLoader";
-import jsPDF from 'jspdf';
+import jsPDF from "jspdf";
 
-
-const InvalidFiles = ['mp3','mp4','gif','jpeg','jpg','png','svg','webp','class','exe']
+const InvalidFiles = [
+  "mp3",
+  "mp4",
+  "gif",
+  "jpeg",
+  "jpg",
+  "png",
+  "svg",
+  "webp",
+  "class",
+  "exe",
+];
 
 function Page() {
   const [repoLink, setRepoLink] = useState<string>("");
@@ -31,7 +41,6 @@ function Page() {
   const [repLoading, setRepoLoading] = useState(false);
   const [codeLoading, setCodeLoading] = useState(false);
   const [expLoading, setExpLoading] = useState(false);
-  const [recentRepos, setRecentRepos] = useState<Array<String>>();
 
   const handleSelection = () => {
     const selection = window.getSelection();
@@ -53,15 +62,10 @@ function Page() {
   }, [repoLink]);
 
   const GetRepo = async () => {
-    // if(userName==null || repoName==null ){
-    //   return
-    // }
     if (repoLink == null || repoLink == "") {
       return;
     }
-
     setRepoLoading(true);
-    // setRecentRepos([...recentRepos,${userName}/${repoName}])
     const d = localStorage.getItem(`${userName}/${repoName}`);
     if (d == null) {
       try {
@@ -88,13 +92,8 @@ function Page() {
     setRepoLoading(false);
   };
 
-  useEffect(() => {
-    localStorage.setItem("recentRepos", JSON.stringify(recentRepos));
-  }, [recentRepos]);
-
   const LoadExp = async () => {
     setExpLoading(true);
-    // const cache = localStorage.getItem(${selectedFile})
     const cache = null;
     if (selectedFile == null) {
       return;
@@ -109,7 +108,6 @@ function Page() {
                 ...explanations,
                 selectedFile: res.data.message,
               });
-              // localStorage.setItem(${selectedFile}, res.data.message);
             });
         } else {
           await axios
@@ -119,7 +117,6 @@ function Page() {
                 ...explanations,
                 selectedFile: res.data.message,
               });
-              // localStorage.setItem(${selectedFile}, res.data.message);
             });
         }
       } catch (error) {}
@@ -136,26 +133,21 @@ function Page() {
     }
   }, [selectedFile]);
 
-
-  const AskFurtherExp = async()=>{
-    setSnippetBox(false)
+  const AskFurtherExp = async () => {
+    setSnippetBox(false);
     setExpLoading(true);
     try {
       await axios
-            .post("api/users/askgeminitext", { prompt:SnippetPrompt() })
-            .then((res) => {
-              setExplanations({
-                ...explanations,
-                selectedFile: res.data.message,
-              });
-            });     
-    } catch (error) {
-      
-    }
-    setExpLoading(false)
-  }
-
-
+        .post("api/users/askgeminitext", { prompt: SnippetPrompt() })
+        .then((res) => {
+          setExplanations({
+            ...explanations,
+            selectedFile: res.data.message,
+          });
+        });
+    } catch (error) {}
+    setExpLoading(false);
+  };
 
   function readMePrompt() {
     const a =
@@ -183,20 +175,17 @@ function Page() {
     return regex.test(string);
   }
 
-  useEffect(() => {
-    // setRecentRepos(localStorage.getItem('recentRepos')|| null)
-    // localStorage.clear();
-  }, []);
-
-
   const downloadPDF = (content) => {
     const doc = new jsPDF();
-  
+
     const margin = 10;
     const pageHeight = doc.internal.pageSize.height - 2 * margin;
-  
-    const lines = doc.splitTextToSize(content, doc.internal.pageSize.width - 2 * margin);
-  
+
+    const lines = doc.splitTextToSize(
+      content,
+      doc.internal.pageSize.width - 2 * margin
+    );
+
     let y = margin;
     let currentPage = 1;
     lines.forEach((line, index) => {
@@ -206,38 +195,26 @@ function Page() {
         y = margin;
       }
       doc.text(margin, y, line);
-      y += doc.getTextDimensions(line).h + 5; // Line height + padding
+      y += doc.getTextDimensions(line).h + 5;
     });
-  
-    // Generate the PDF
+
     const pdfContent = doc.output();
-  
-    // Create a blob from the PDF content
+
     const blob = new Blob([pdfContent], { type: "application/pdf" });
-  
-    // Create a temporary anchor element
+
     const link = document.createElement("a");
     link.href = window.URL.createObjectURL(blob);
-  
-    // Set the file name
     link.download = "content.pdf";
-  
-    // Trigger the download
     link.click();
-  
-    // Clean up
     setTimeout(() => {
-      // For Firefox it is necessary to delay revoking the ObjectURL
       window.URL.revokeObjectURL(link.href);
       link.remove();
     }, 100);
   };
 
-
   return (
     <div className="spacebg">
       <NavBar />
-
       <div className="flex justify-center gap-5">
         <input
           type="text"
@@ -253,9 +230,8 @@ function Page() {
           <>
             <Button
               disabled
-            variant="anibutton"
-            className="h-10 mt-8 min-w-[100px] text-md font-semibold"
-
+              variant="anibutton"
+              className="h-10 mt-8 min-w-[100px] text-md font-semibold"
               onClick={(e) => {
                 e.preventDefault();
                 setData(null);
@@ -263,13 +239,12 @@ function Page() {
               }}
             >
               <span className="relative z-10">Loading...</span>
-              
             </Button>
           </>
         ) : (
           <>
             <Button
-            variant="anibutton"
+              variant="anibutton"
               className="h-10 mt-8 min-w-[100px] text-md font-semibold"
               onClick={(e) => {
                 e.preventDefault();
@@ -278,7 +253,6 @@ function Page() {
               }}
             >
               <span className="relative z-10">Get Repo</span>
-              
             </Button>
           </>
         )}
@@ -288,34 +262,46 @@ function Page() {
         <div className="">
           <div className="grid grid-cols-8">
             <div className="bg-[#264F9460] col-span-2 m-6 mr-0 mb-0 rounded-2xl flex justify-center">
-                <div className="text-white w-5/6 m-2 mr-2 h-[550px] rounded-2xl flex flex-col">
-                  <p className="text-xl p-2 font-mono"> <PiCode className="inline h-7 w-7" /> {repoName && repoName.toUpperCase()}</p>
-                  <hr className="mb-5" />
-                  <div className="flex flex-col h-[550px] text-[#b5daff] gap-1 overflow-y-auto custom-scrollbar">
-                    {data &&
-                      Object.keys(data).map((key) => {
-                        return (
-                          <button
-                            onClick={(e) => {
-                              e.preventDefault();
-                              const a = key.split('.')[key.split('.').length - 1];
-                              if( !InvalidFiles.includes(a.toLowerCase()) && !InvalidFiles.includes(a.toUpperCase())){
-                                setSelectedFile(key);
-                              }
-                            }}
-                            key={key}
+              <div className="text-white w-5/6 m-2 mr-2 h-[550px] rounded-2xl flex flex-col">
+                <p className="text-xl p-2 font-mono">
+                  {" "}
+                  <PiCode className="inline h-7 w-7" />{" "}
+                  {repoName && repoName.toUpperCase()}
+                </p>
+                <hr className="mb-5" />
+                <div className="flex flex-col h-[550px] text-[#b5daff] gap-1 overflow-y-auto custom-scrollbar">
+                  {data &&
+                    Object.keys(data).map((key) => {
+                      return (
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            const a = key.split(".")[key.split(".").length - 1];
+                            if (
+                              !InvalidFiles.includes(a.toLowerCase()) &&
+                              !InvalidFiles.includes(a.toUpperCase())
+                            ) {
+                              setSelectedFile(key);
+                            }
+                          }}
+                          key={key}
+                        >
+                          {" "}
+                          <p
+                            className={` ${
+                              key == selectedFile
+                                ? " bg-blue-500 "
+                                : " bg-[#40506a] "
+                            } text-left pl-3 py-1 rounded-md hover:border`}
                           >
-                            {" "}
-                            <p className={` ${key == selectedFile ? " bg-blue-500 " : " bg-[#40506a] "} text-left pl-3 py-1 rounded-md hover:border`}>{key}</p>{" "}
-                          </button>
-                        );
-                      })}
-                  </div>
+                            {key}
+                          </p>{" "}
+                        </button>
+                      );
+                    })}
                 </div>
-                <div>
-     
-    </div>
-                
+              </div>
+              <div></div>
             </div>
             <div className="bg-[#264F9460] col-span-3 m-6 mr-0 rounded-2xl text-white h-[550px] p-4 overflow-y-auto custom-scrollbar hover:border">
               {data &&
@@ -336,7 +322,6 @@ function Page() {
                     );
                 })}
               <div>
-              
                 {selectedText && (
                   <div
                     className=""
@@ -346,25 +331,24 @@ function Page() {
                       left: buttonPosition.x,
                     }}
                   >
-                    <Button className=" w-20 p-1"
-                    variant = "snipbutton"
+                    <Button
+                      className=" w-20 p-1"
+                      variant="snipbutton"
                       onClick={() => {
                         setSnippetBox(true);
                       }}
                     >
                       Snip
                     </Button>
-                    <Button className=" w-20 p-1"
-                    variant = "snipbutton"
+                    <Button
+                      className=" w-20 p-1"
+                      variant="snipbutton"
                       onClick={() => {
-                        AskFurtherExp()
+                        AskFurtherExp();
                       }}
                     >
                       Ask GPT
                     </Button>
-
-
-                    {/* opens snippet box */}
                   </div>
                 )}
               </div>
@@ -373,8 +357,8 @@ function Page() {
               {snippetBox ? (
                 <>
                   <Button
-                  variant="snipbutton"
-                  className="w-10 p-1 rounded-full m-3 mb-0 fixed"
+                    variant="snipbutton"
+                    className="w-10 p-1 rounded-full m-3 mb-0 fixed"
                     onClick={() => {
                       setSnippetBox(false);
                     }}
@@ -382,40 +366,43 @@ function Page() {
                     {" "}
                     <IoMdClose className="h-5 w-5 inline" />{" "}
                   </Button>
-                  <SnippetComponent code={selectedText} getHubLink={repoLink}/>
+                  <SnippetComponent code={selectedText} getHubLink={repoLink} />
                 </>
               ) : (
                 <>
                   {expLoading ? (
                     // <div ><HashLoader color="#2196f3" size={100} /></div>
-                    <div className="flex items-center justify-center h-[550px]"><RingLoader color="#2196f3" size={100} /></div>
-
+                    <div className="flex items-center justify-center h-[550px]">
+                      <RingLoader color="#2196f3" size={100} />
+                    </div>
                   ) : (
                     <>
-                      {explanations && 
-                      
-                    Object.keys(explanations).map((key) => {
-                      return ( 
-                      <>
-                        <Button className=" w-20 p-1"
-                      variant = "snipbutton"
-                        onClick={() => {
-                         
-                          downloadPDF( data[selectedFile] + explanations[key])
-                        }}
-                      >
-                        Download
-                      </Button>
-                        <div key={key} className="p-4">
-                          <pre className="whitespace-pre-wrap font-sans" key={key}>
-                          {explanations[key]}{" "}
-                        </pre>
-                        </div>
-                      </>
-                      );
-                    })
-                     
-                        }
+                      {explanations &&
+                        Object.keys(explanations).map((key) => {
+                          return (
+                            <>
+                              <Button
+                                className=" w-20 p-1"
+                                variant="snipbutton"
+                                onClick={() => {
+                                  downloadPDF(
+                                    data[selectedFile] + explanations[key]
+                                  );
+                                }}
+                              >
+                                Download
+                              </Button>
+                              <div key={key} className="p-4">
+                                <pre
+                                  className="whitespace-pre-wrap font-sans"
+                                  key={key}
+                                >
+                                  {explanations[key]}{" "}
+                                </pre>
+                              </div>
+                            </>
+                          );
+                        })}
                     </>
                   )}
                 </>
